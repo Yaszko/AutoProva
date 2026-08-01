@@ -1,0 +1,64 @@
+export function buildSystemPrompt(numQuestoes: number): string {
+  return `Você é um assistente especializado em elaborar avaliações acadêmicas para professores brasileiros.
+
+Regras obrigatórias:
+- A avaliação completa (as ${numQuestoes} questões, incluindo enunciados e alternativas) NUNCA deve ultrapassar 2 páginas A4 impressas, a menos que o usuário peça explicitamente mais espaço ou enunciados mais longos no prompt. Para respeitar esse limite, escreva enunciados e alternativas de forma objetiva e concisa.
+- Gere exatamente ${numQuestoes} questões, numeradas de 1 a ${numQuestoes}, seguindo o assunto, o nível de dificuldade e as orientações descritas pelo usuário.
+- Combine questões de múltipla escolha ("multipla_escolha", com exatamente 4 alternativas, de "a" a "d") e questões dissertativas ("dissertativa"), a menos que o usuário peça explicitamente apenas um dos dois tipos.
+- Para questões dissertativas, o campo "alternativas" deve ser um array vazio.
+- Todo o texto deve estar em português do Brasil.
+- Escreva expressões matemáticas usando sintaxe LaTeX delimitada por cifrão simples, por exemplo: $x^2 + 2x + 1 = 0$. Para frações, utilize \\frac{numerador}{denominador} dentro do modo matemático, por exemplo $\\frac{1}{4} + \\frac{2}{3}$.
+- Números decimais (parte inteira e decimal separadas por vírgula) devem ser escritos normalmente, sem chaves e sem cifrão ao redor, por exemplo: 5,0 m ou 8,65. NUNCA escreva a vírgula decimal entre chaves (nunca escreva 5{,}0), nem dentro nem fora de expressões matemáticas.
+- Preencha o campo "assunto" com um título curto (2 a 5 palavras) resumindo o tema central da prova, em português, com inicial maiúscula nas palavras principais, por exemplo: "Teorema de Pitágoras", "Frações e Números Decimais". Esse texto é usado no nome do arquivo baixado pelo professor, então não utilize aspas nem os caracteres \\ / : * ? < > |.
+- Você DEVE responder chamando a ferramenta "gerar_prova" com os dados estruturados. Não escreva nenhum texto fora da chamada da ferramenta.`;
+}
+
+export function buildExamTool(numQuestoes: number) {
+  return {
+    name: 'gerar_prova',
+    description: `Estrutura os dados completos de uma avaliação acadêmica de ${numQuestoes} questões, prontos para serem exibidos na prévia HTML e exportados em PDF.`,
+    input_schema: {
+      type: 'object',
+      properties: {
+        assunto: {
+          type: 'string',
+          description:
+            'Título curto (2 a 5 palavras) resumindo o assunto/tema central da prova, em português. Usado no nome do arquivo exportado, então não deve conter aspas nem os caracteres \\ / : * ? < > |. Ex: "Teorema de Pitágoras".',
+        },
+        questoes: {
+          type: 'array',
+          description: `Lista com exatamente ${numQuestoes} questões da avaliação.`,
+          minItems: numQuestoes,
+          maxItems: numQuestoes,
+          items: {
+            type: 'object',
+            properties: {
+              numero: { type: 'integer', description: `Número da questão, de 1 a ${numQuestoes}.` },
+              tipo: {
+                type: 'string',
+                enum: ['multipla_escolha', 'dissertativa'],
+                description: 'Tipo da questão.',
+              },
+              enunciado: { type: 'string', description: 'Enunciado completo da questão.' },
+              alternativas: {
+                type: 'array',
+                description:
+                  'Alternativas da questão: array vazio para dissertativas, exatamente 4 (letras a a d) para múltipla escolha.',
+                items: {
+                  type: 'object',
+                  properties: {
+                    letra: { type: 'string', description: 'Letra da alternativa (a, b, c ou d).' },
+                    texto: { type: 'string', description: 'Texto da alternativa.' },
+                  },
+                  required: ['letra', 'texto'],
+                },
+              },
+            },
+            required: ['numero', 'tipo', 'enunciado', 'alternativas'],
+          },
+        },
+      },
+      required: ['assunto', 'questoes'],
+    },
+  } as const;
+}

@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npm install)",
+      "PowerShell(Get-Command node -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command npm -ErrorAction SilentlyContinue)",
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; npm install html-to-image)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; npm uninstall html2canvas)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; npm run build)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; npm ls html2canvas 2>$null)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node pdf-download-test.mjs; node render-pdf.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node html-tab-test.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node editor-test.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node count-test.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node dissertativa-overlap-test.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node all-dissertativa-test.mjs)",
+      "PowerShell(Remove-Item \"c:\\\\VSC Projects\\\\AutoProva\\\\src\\\\lib\\\\slugify.ts\" -Confirm:$false)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node filename-test.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node ai-edit-test.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node button-width-test.mjs)"
+    ]
+  }
+}
