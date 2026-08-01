@@ -31,7 +31,19 @@
       "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId=21004\")",
       "PowerShell(Stop-Process -Id 21004 -Force -ErrorAction SilentlyContinue)",
       "PowerShell(Stop-Process -Id 16216 -Force -ErrorAction SilentlyContinue)",
-      "PowerShell(Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyContinue)"
+      "PowerShell(Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyContinue)",
+      "Bash(gh auth *)",
+      "Bash(gh run *)",
+      "Bash(gh api *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:yaszko.github.io)",
+      "Bash(curl -s https://yaszko.github.io/AutoProvaa/)",
+      "Bash(rm -f vite.config.js vite.config.d.ts tsconfig.node.tsbuildinfo tsconfig.tsbuildinfo)",
+      "Bash(git rm *)",
+      "Bash(curl -s -o /dev/null -w \"JS: %{http_code} content-type follows\\\\n\" -D - https://yaszko.github.io/AutoProvaa/assets/index-DHrtz9My.js -o /dev/null)"
     ]
   }
 }
