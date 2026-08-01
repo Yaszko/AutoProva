@@ -43,7 +43,11 @@
       "Bash(curl -s https://yaszko.github.io/AutoProvaa/)",
       "Bash(rm -f vite.config.js vite.config.d.ts tsconfig.node.tsbuildinfo tsconfig.tsbuildinfo)",
       "Bash(git rm *)",
-      "Bash(curl -s -o /dev/null -w \"JS: %{http_code} content-type follows\\\\n\" -D - https://yaszko.github.io/AutoProvaa/assets/index-DHrtz9My.js -o /dev/null)"
+      "Bash(curl -s -o /dev/null -w \"JS: %{http_code} content-type follows\\\\n\" -D - https://yaszko.github.io/AutoProvaa/assets/index-DHrtz9My.js -o /dev/null)",
+      "Bash(curl -s -o /dev/null -w \"favicon: %{http_code}\\\\n\" https://yaszko.github.io/AutoProvaa/favicon.svg)",
+      "Bash(curl -s -o /dev/null -w \"logo_escola: %{http_code}\\\\n\" https://yaszko.github.io/AutoProvaa/logo_escola.png)",
+      "Bash(curl -s -o /dev/null -w \"logo_apg: %{http_code}\\\\n\" https://yaszko.github.io/AutoProvaa/logo_apg.png)",
+      "Bash(curl -s https://yaszko.github.io/AutoProvaa/favicon.svg)"
     ]
   }
 }

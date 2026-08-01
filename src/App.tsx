@@ -11,7 +11,7 @@ import { generateExam, AnthropicApiError } from './lib/anthropicClient';
 import { ExamData, HeaderInfo } from './types';
 
 const DEFAULT_HEADER: HeaderInfo = {
-  professor: 'Yanko',
+  professor: '',
   turma: '',
   tipo: 'avaliacao',
   valor: '',
