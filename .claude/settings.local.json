@@ -19,7 +19,19 @@
       "PowerShell(Remove-Item \"c:\\\\VSC Projects\\\\AutoProva\\\\src\\\\lib\\\\slugify.ts\" -Confirm:$false)",
       "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node filename-test.mjs)",
       "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node ai-edit-test.mjs)",
-      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node button-width-test.mjs)"
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\Users\\\\yanko\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--VSC-Projects-AutoProva\\\\594f895a-b4bc-490e-a9f6-1f32b3ea45cf\\\\scratchpad\"; node button-width-test.mjs)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"localhost: %{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w \"192.168.1.17: %{http_code}\\\\n\" http://192.168.1.17:5173/)",
+      "PowerShell(Get-NetFirewallRule -DisplayName \"Node.js JavaScript Runtime\")",
+      "PowerShell(Get-NetConnectionProfile)",
+      "PowerShell(Get-Process -Id 21004 -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Process -Id 16216 -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId=16216\")",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId=21004\")",
+      "PowerShell(Stop-Process -Id 21004 -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Id 16216 -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyContinue)"
     ]
   }
 }
