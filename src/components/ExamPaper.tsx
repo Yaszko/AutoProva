@@ -60,10 +60,10 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(function Exa
     <div ref={ref} className="bg-zinc-50 p-8 text-zinc-900">
       <div className="relative mb-3 min-h-16">
         <div className="absolute left-0 top-0">
-          <LogoImage src="/logo_escola.png" alt="logo_escola.png" />
+          <LogoImage src={`${import.meta.env.BASE_URL}logo_escola.png`} alt="logo_escola.png" />
         </div>
         <div className="absolute right-0 top-0">
-          <LogoImage src="/logo_apg.png" alt="logo_apg.png" />
+          <LogoImage src={`${import.meta.env.BASE_URL}logo_apg.png`} alt="logo_apg.png" />
         </div>
         <div className="mx-auto max-w-[calc(100%-9rem)] text-center text-[0.625rem]">
           <p className="text-sm font-bold">{INSTITUICAO}</p>
