@@ -12,6 +12,14 @@ interface QuestionEditorProps {
 
 const ALTERNATIVA_LETRAS = ['a', 'b', 'c', 'd'];
 
+function normalizeImageSource(source: string): string {
+  const trimmed = source.trim();
+  if (trimmed.startsWith('<svg')) {
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(trimmed)}`;
+  }
+  return source;
+}
+
 function updateQuestao(exam: ExamData, numero: number, updater: (questao: Questao) => Questao): ExamData {
   return {
     ...exam,
@@ -100,6 +108,7 @@ interface QuestionCardProps {
   canRemove: boolean;
   onTipoChange: (tipo: TipoQuestao) => void;
   onEnunciadoChange: (value: string) => void;
+  onImagemChange: (value: string) => void;
   onAlternativaChange: (letra: string, value: string) => void;
   onRemove: () => void;
   onAiEdit: (instruction: string) => Promise<void>;
@@ -110,6 +119,7 @@ function QuestionCard({
   canRemove,
   onTipoChange,
   onEnunciadoChange,
+  onImagemChange,
   onAlternativaChange,
   onRemove,
   onAiEdit,
@@ -155,6 +165,23 @@ function QuestionCard({
         rows={3}
         className="w-full resize-y rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-2 text-xs text-zinc-100 focus:border-zinc-600 focus:outline-none"
       />
+
+      <div className="mt-2 space-y-1.5">
+        <input
+          type="text"
+          value={questao.imagem ?? ''}
+          onChange={(e) => onImagemChange(e.target.value)}
+          placeholder="URL da imagem (opcional)"
+          className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
+        />
+        {questao.imagem && (
+          <img
+            src={normalizeImageSource(questao.imagem)}
+            alt={`Preview da imagem da questão ${questao.numero}`}
+            className="max-h-32 rounded-md border border-zinc-800 bg-zinc-950 object-contain"
+          />
+        )}
+      </div>
 
       {questao.tipo === 'multipla_escolha' && (
         <div className="mt-2 space-y-1.5">
@@ -215,6 +242,10 @@ export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditor
 
   function handleEnunciadoChange(numero: number, enunciado: string) {
     onChange(updateQuestao(currentExam, numero, (questao) => ({ ...questao, enunciado })));
+  }
+
+  function handleImagemChange(numero: number, imagem: string) {
+    onChange(updateQuestao(currentExam, numero, (questao) => ({ ...questao, imagem: imagem || undefined })));
   }
 
   function handleAlternativaChange(numero: number, letra: string, texto: string) {
@@ -301,6 +332,7 @@ export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditor
             canRemove={exam.questoes.length > 1}
             onTipoChange={(tipo) => handleTipoChange(questao.numero, tipo)}
             onEnunciadoChange={(value) => handleEnunciadoChange(questao.numero, value)}
+            onImagemChange={(value) => handleImagemChange(questao.numero, value)}
             onAlternativaChange={(letra, value) => handleAlternativaChange(questao.numero, letra, value)}
             onRemove={() => handleRemoveQuestao(questao.numero)}
             onAiEdit={(instruction) => handleAiEditQuestao(questao.numero, instruction)}

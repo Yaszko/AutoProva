@@ -7,6 +7,11 @@ Regras obrigatórias:
 - Questões de múltipla escolha ("multipla_escolha") devem ter exatamente 4 alternativas, com letras "a" a "d". Questões dissertativas ("dissertativa") devem ter o campo "alternativas" como array vazio.
 - Para questões de múltipla escolha, preencha "respostaCorreta" com a letra (a, b, c ou d) da alternativa correta.
 - Para questões dissertativas, deixe "respostaCorreta" como string vazia "".
+- Se a questão exigir uma figura para ajudar na visualização, preencha o campo opcional "imagem" com uma URL válida, data URI ou um bloco SVG inline. Essa imagem deve aparecer abaixo do enunciado e acima das alternativas.
+- Quando houver imagem, revise a coerência entre o enunciado, a figura e as alternativas antes de responder: a imagem deve corresponder fielmente ao texto do problema, mostrar as medidas e o contexto corretos, e não contradizer a pergunta nem a resposta esperada.
+- Ao revisar a imagem, verifique também a formatação visual: os rótulos de medidas devem ficar fora da linha principal, sem sobrepor a diagonal, sem colar em bordas, sem ficar sobre os elementos do desenho e sem reduzir a legibilidade. O texto deve estar claramente posicionado, com boa separação visual e alinhamento adequado.
+- Se a imagem estiver inconsistente ou visualmente mal formatada, corrija a figura antes de finalizar a resposta. Não entregue uma imagem que pareça desajeitada, com sobreposição de texto, elementos sobrepostos ou com rótulos ilegíveis.
+- Trate a imagem como parte essencial da questão: não basta gerar um desenho; ela precisa ser revisada visualmente antes de responder para garantir clareza, estética adequada e ausência de sobreposição.
 - Em toda questão (múltipla escolha ou dissertativa), preencha "resolucao" com uma resolução breve, direta e simplificada (poucas linhas, sem desenvolvimento longo) que justifique a resposta correta.
 - Todo o texto deve estar em português do Brasil.
 - Escreva expressões matemáticas usando sintaxe LaTeX delimitada por cifrão simples, por exemplo: $x^2 + 2x + 1 = 0$. Para frações, utilize \\frac{numerador}{denominador} dentro do modo matemático, por exemplo $\\frac{1}{4} + \\frac{2}{3}$.
@@ -25,6 +30,11 @@ export const QUESTION_EDIT_TOOL = {
         description: 'Tipo da questão.',
       },
       enunciado: { type: 'string', description: 'Enunciado completo da questão.' },
+      imagem: {
+        type: 'string',
+        description:
+          'Imagem opcional exibida abaixo do enunciado e acima das alternativas. Pode ser uma URL, data URI ou um SVG inline completo.',
+      },
       alternativas: {
         type: 'array',
         description:

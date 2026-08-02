@@ -131,6 +131,7 @@ function sanitizeExamData(data: ExamData): ExamData {
     questoes: data.questoes.map((questao) => ({
       ...questao,
       enunciado: stripBracedComma(questao.enunciado),
+      imagem: questao.imagem ? stripBracedComma(questao.imagem) : undefined,
       alternativas: questao.alternativas.map((alt) => ({ ...alt, texto: stripBracedComma(alt.texto) })),
       resolucao: stripBracedComma(questao.resolucao),
     })),
@@ -140,6 +141,7 @@ function sanitizeExamData(data: ExamData): ExamData {
 export interface QuestionEditResult {
   tipo: TipoQuestao;
   enunciado: string;
+  imagem?: string;
   alternativas: Alternativa[];
   respostaCorreta: string;
   resolucao: string;
@@ -170,6 +172,7 @@ export async function editQuestion(
         {
           tipo: context.questaoAtual.tipo,
           enunciado: context.questaoAtual.enunciado,
+          imagem: context.questaoAtual.imagem,
           alternativas: context.questaoAtual.alternativas,
           respostaCorreta: context.questaoAtual.respostaCorreta,
           resolucao: context.questaoAtual.resolucao,
@@ -199,6 +202,7 @@ function sanitizeQuestionResult(result: QuestionEditResult): QuestionEditResult 
   return {
     tipo: result.tipo,
     enunciado: stripBracedComma(result.enunciado),
+    imagem: result.imagem ? stripBracedComma(result.imagem) : undefined,
     alternativas: result.alternativas.map((alt) => ({ ...alt, texto: stripBracedComma(alt.texto) })),
     respostaCorreta: result.respostaCorreta,
     resolucao: stripBracedComma(result.resolucao),

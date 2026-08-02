@@ -9,6 +9,8 @@ export interface Questao {
   numero: number;
   tipo: TipoQuestao;
   enunciado: string;
+  /** URL, data URI ou SVG inline opcional exibido abaixo do enunciado. */
+  imagem?: string;
   alternativas: Alternativa[];
   /** Letra (a, b, c ou d) da alternativa correta. Preenchido apenas para questões de múltipla escolha. */
   respostaCorreta: string;

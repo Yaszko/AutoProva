@@ -39,6 +39,14 @@ function LetraBolha({ letra, preenchida }: { letra: string; preenchida: boolean 
   return <span>{CIRCLED_LETTERS[letra] ?? letra}</span>;
 }
 
+function normalizeImageSource(source: string): string {
+  const trimmed = source.trim();
+  if (trimmed.startsWith('<svg')) {
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(trimmed)}`;
+  }
+  return source;
+}
+
 function GabaritoBox({ questoes, mode }: { questoes: Questao[]; mode: ExamPaperMode }) {
   return (
     <table className="float-right mb-2 ml-4 border-collapse border border-zinc-400 text-xs">
@@ -141,6 +149,15 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(function Exa
               <p className="mb-2">
                 <span className="font-semibold">{questao.numero}.</span> <MathText text={questao.enunciado} />
               </p>
+              {questao.imagem ? (
+                <div className="mb-2 flex justify-center">
+                  <img
+                    src={normalizeImageSource(questao.imagem)}
+                    alt={`Imagem da questão ${questao.numero}`}
+                    className="max-h-56 max-w-full rounded-md border border-zinc-300 bg-white object-contain"
+                  />
+                </div>
+              ) : null}
               {questao.tipo === 'multipla_escolha' ? (
                 <ul className="ml-4 space-y-1">
                   {questao.alternativas.map((alt) => (
