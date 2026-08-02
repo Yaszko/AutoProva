@@ -10,6 +10,10 @@ export interface Questao {
   tipo: TipoQuestao;
   enunciado: string;
   alternativas: Alternativa[];
+  /** Letra (a, b, c ou d) da alternativa correta. Preenchido apenas para questões de múltipla escolha. */
+  respostaCorreta: string;
+  /** Resolução breve e simplificada, exibida no PDF de gabarito. Preenchida apenas para questões dissertativas. */
+  resolucao: string;
 }
 
 export interface ExamData {

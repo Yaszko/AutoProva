@@ -9,7 +9,7 @@ interface ResultPanelProps {
   header: HeaderInfo;
 }
 
-type Tab = 'preview' | 'html';
+type Tab = 'preview' | 'gabarito' | 'html';
 
 export function ResultPanel({ exam, header }: ResultPanelProps) {
   const [tab, setTab] = useState<Tab>('preview');
@@ -32,7 +32,16 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
             tab === 'preview' ? 'border-b-2 border-zinc-100 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'
           }`}
         >
-          Prévia do Documento
+          Prévia da Prova
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('gabarito')}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            tab === 'gabarito' ? 'border-b-2 border-zinc-100 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'
+          }`}
+        >
+          Prévia do Gabarito
         </button>
         <button
           type="button"
@@ -45,7 +54,9 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
         </button>
       </div>
 
-      {tab === 'preview' ? <PreviewDocument exam={exam} header={header} /> : <HtmlCodeView exam={exam} header={header} />}
+      {tab === 'preview' && <PreviewDocument exam={exam} header={header} mode="prova" />}
+      {tab === 'gabarito' && <PreviewDocument exam={exam} header={header} mode="gabarito" />}
+      {tab === 'html' && <HtmlCodeView exam={exam} header={header} />}
     </section>
   );
 }

@@ -6,6 +6,9 @@ Regras obrigatórias:
 - Gere exatamente ${numQuestoes} questões, numeradas de 1 a ${numQuestoes}, seguindo o assunto, o nível de dificuldade e as orientações descritas pelo usuário.
 - Combine questões de múltipla escolha ("multipla_escolha", com exatamente 4 alternativas, de "a" a "d") e questões dissertativas ("dissertativa"), a menos que o usuário peça explicitamente apenas um dos dois tipos.
 - Para questões dissertativas, o campo "alternativas" deve ser um array vazio.
+- Para questões de múltipla escolha, preencha "respostaCorreta" com a letra (a, b, c ou d) da alternativa correta.
+- Para questões dissertativas, deixe "respostaCorreta" como string vazia "".
+- Em toda questão (múltipla escolha ou dissertativa), preencha "resolucao" com uma resolução breve, direta e simplificada (poucas linhas, sem desenvolvimento longo) que justifique a resposta correta.
 - Todo o texto deve estar em português do Brasil.
 - Escreva expressões matemáticas usando sintaxe LaTeX delimitada por cifrão simples, por exemplo: $x^2 + 2x + 1 = 0$. Para frações, utilize \\frac{numerador}{denominador} dentro do modo matemático, por exemplo $\\frac{1}{4} + \\frac{2}{3}$.
 - Números decimais (parte inteira e decimal separadas por vírgula) devem ser escritos normalmente, sem chaves e sem cifrão ao redor, por exemplo: 5,0 m ou 8,65. NUNCA escreva a vírgula decimal entre chaves (nunca escreva 5{,}0), nem dentro nem fora de expressões matemáticas.
@@ -53,8 +56,18 @@ export function buildExamTool(numQuestoes: number) {
                   required: ['letra', 'texto'],
                 },
               },
+              respostaCorreta: {
+                type: 'string',
+                description:
+                  'Letra (a, b, c ou d) da alternativa correta. Obrigatório para questões de múltipla escolha; string vazia "" para dissertativas.',
+              },
+              resolucao: {
+                type: 'string',
+                description:
+                  'Resolução breve, direta e simplificada da questão (poucas linhas), justificando a resposta correta. Obrigatório para toda questão, seja múltipla escolha ou dissertativa.',
+              },
             },
-            required: ['numero', 'tipo', 'enunciado', 'alternativas'],
+            required: ['numero', 'tipo', 'enunciado', 'alternativas', 'respostaCorreta', 'resolucao'],
           },
         },
       },

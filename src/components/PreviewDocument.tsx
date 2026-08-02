@@ -4,7 +4,7 @@ import { jsPDF } from 'jspdf';
 import { Download, Loader2 } from 'lucide-react';
 import { ExamData, HeaderInfo } from '../types';
 import { buildDownloadFileName } from '../lib/fileName';
-import { ExamPaper } from './ExamPaper';
+import { ExamPaper, ExamPaperMode } from './ExamPaper';
 
 const PDF_MARGIN_MM = 10;
 const PAGE_WIDTH_MM = 210;
@@ -65,9 +65,10 @@ async function renderElementToPdf(element: HTMLElement, fileName: string) {
 interface PreviewDocumentProps {
   exam: ExamData;
   header: HeaderInfo;
+  mode?: ExamPaperMode;
 }
 
-export function PreviewDocument({ exam, header }: PreviewDocumentProps) {
+export function PreviewDocument({ exam, header, mode = 'prova' }: PreviewDocumentProps) {
   const paperRef = useRef<HTMLDivElement>(null);
   const [generating, setGenerating] = useState(false);
 
@@ -75,7 +76,8 @@ export function PreviewDocument({ exam, header }: PreviewDocumentProps) {
     if (!paperRef.current || generating) return;
     setGenerating(true);
     try {
-      await renderElementToPdf(paperRef.current, buildDownloadFileName(header, exam, 'pdf'));
+      const suffix = mode === 'gabarito' ? 'Gabarito' : undefined;
+      await renderElementToPdf(paperRef.current, buildDownloadFileName(header, exam, 'pdf', suffix));
     } finally {
       setGenerating(false);
     }
@@ -96,7 +98,7 @@ export function PreviewDocument({ exam, header }: PreviewDocumentProps) {
       </div>
 
       <div className="mx-auto max-w-2xl overflow-hidden rounded-sm shadow-xl">
-        <ExamPaper ref={paperRef} exam={exam} header={header} />
+        <ExamPaper ref={paperRef} exam={exam} header={header} mode={mode} />
       </div>
     </div>
   );

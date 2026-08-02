@@ -208,6 +208,7 @@ export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditor
             : questao.alternativas.length > 0
               ? questao.alternativas
               : ALTERNATIVA_LETRAS.map((letra) => ({ letra, texto: '' })),
+        respostaCorreta: tipo === 'dissertativa' ? '' : questao.respostaCorreta,
       })),
     );
   }
@@ -235,6 +236,8 @@ export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditor
         tipo: 'multipla_escolha',
         enunciado: '',
         alternativas: ALTERNATIVA_LETRAS.map((letra) => ({ letra, texto: '' })),
+        respostaCorreta: '',
+        resolucao: '',
       }),
     );
   }

@@ -4,9 +4,12 @@ import { buildExamTitle } from '../lib/examTitle';
 import { EMAIL, ENDERECO, INSTITUICAO, TELEFONE } from '../lib/schoolInfo';
 import { MathText } from './MathText';
 
+export type ExamPaperMode = 'prova' | 'gabarito';
+
 interface ExamPaperProps {
   exam: ExamData;
   header: HeaderInfo;
+  mode?: ExamPaperMode;
 }
 
 function LogoImage({ src, alt }: { src: string; alt: string }) {
@@ -25,7 +28,18 @@ function LogoImage({ src, alt }: { src: string; alt: string }) {
 
 const CIRCLED_LETTERS: Record<string, string> = { A: 'Ⓐ', B: 'Ⓑ', C: 'Ⓒ', D: 'Ⓓ' };
 
-function GabaritoBox({ questoes }: { questoes: Questao[] }) {
+function LetraBolha({ letra, preenchida }: { letra: string; preenchida: boolean }) {
+  if (preenchida) {
+    return (
+      <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-zinc-900 align-middle text-[9px] font-bold leading-none text-white">
+        {letra}
+      </span>
+    );
+  }
+  return <span>{CIRCLED_LETTERS[letra] ?? letra}</span>;
+}
+
+function GabaritoBox({ questoes, mode }: { questoes: Questao[]; mode: ExamPaperMode }) {
   return (
     <table className="float-right mb-2 ml-4 border-collapse border border-zinc-400 text-xs">
       <thead>
@@ -43,7 +57,18 @@ function GabaritoBox({ questoes }: { questoes: Questao[] }) {
             </td>
             <td className="border border-zinc-400 px-2 py-1 text-center text-sm tracking-widest">
               {questao.tipo === 'multipla_escolha' ? (
-                questao.alternativas.map((alt) => CIRCLED_LETTERS[alt.letra.toUpperCase()] ?? alt.letra).join(' ')
+                <span className="inline-flex gap-1">
+                  {questao.alternativas.map((alt) => {
+                    const letra = alt.letra.toUpperCase();
+                    return (
+                      <LetraBolha
+                        key={letra}
+                        letra={letra}
+                        preenchida={mode === 'gabarito' && letra === questao.respostaCorreta.toUpperCase()}
+                      />
+                    );
+                  })}
+                </span>
               ) : (
                 <span className="italic">dissertativa</span>
               )}
@@ -55,7 +80,10 @@ function GabaritoBox({ questoes }: { questoes: Questao[] }) {
   );
 }
 
-export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(function ExamPaper({ exam, header }, ref) {
+export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(function ExamPaper(
+  { exam, header, mode = 'prova' },
+  ref,
+) {
   return (
     <div ref={ref} className="bg-zinc-50 p-8 text-zinc-900">
       <div className="relative mb-3 min-h-16">
@@ -105,7 +133,7 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(function Exa
 
       <div>
         {exam.questoes.some((questao) => questao.tipo === 'multipla_escolha') && (
-          <GabaritoBox questoes={exam.questoes} />
+          <GabaritoBox questoes={exam.questoes} mode={mode} />
         )}
         <ol className="list-none space-y-6 text-xs">
           {exam.questoes.map((questao) => (
@@ -121,12 +149,18 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(function Exa
                     </li>
                   ))}
                 </ul>
-              ) : (
+              ) : mode === 'prova' ? (
                 <div className="ml-1 mt-2 space-y-3 overflow-hidden">
                   {[0, 1, 2, 3].map((i) => (
                     <div key={i} className="border-b border-dotted border-zinc-400" />
                   ))}
                 </div>
+              ) : null}
+              {mode === 'gabarito' && (
+                <p className="ml-1 mt-2 text-red-600">
+                  <span className="font-semibold">Resolução:</span>{' '}
+                  {questao.resolucao ? <MathText text={questao.resolucao} /> : null}
+                </p>
               )}
             </li>
           ))}

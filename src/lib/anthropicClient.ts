@@ -132,6 +132,7 @@ function sanitizeExamData(data: ExamData): ExamData {
       ...questao,
       enunciado: stripBracedComma(questao.enunciado),
       alternativas: questao.alternativas.map((alt) => ({ ...alt, texto: stripBracedComma(alt.texto) })),
+      resolucao: stripBracedComma(questao.resolucao),
     })),
   };
 }
@@ -140,6 +141,8 @@ export interface QuestionEditResult {
   tipo: TipoQuestao;
   enunciado: string;
   alternativas: Alternativa[];
+  respostaCorreta: string;
+  resolucao: string;
 }
 
 export interface QuestionEditContext {
@@ -168,6 +171,8 @@ export async function editQuestion(
           tipo: context.questaoAtual.tipo,
           enunciado: context.questaoAtual.enunciado,
           alternativas: context.questaoAtual.alternativas,
+          respostaCorreta: context.questaoAtual.respostaCorreta,
+          resolucao: context.questaoAtual.resolucao,
         },
         null,
         2,
@@ -195,5 +200,7 @@ function sanitizeQuestionResult(result: QuestionEditResult): QuestionEditResult 
     tipo: result.tipo,
     enunciado: stripBracedComma(result.enunciado),
     alternativas: result.alternativas.map((alt) => ({ ...alt, texto: stripBracedComma(alt.texto) })),
+    respostaCorreta: result.respostaCorreta,
+    resolucao: stripBracedComma(result.resolucao),
   };
 }
