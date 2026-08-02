@@ -1,24 +1,31 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { HeaderInfo } from '../types';
 import { createSchoolId, SchoolId, SchoolInfo } from '../lib/schoolInfo';
-import { AddSchoolModal } from './AddSchoolModal';
+import { SchoolFormModal } from './SchoolFormModal';
 
 interface HeaderFieldsFormProps {
   value: HeaderInfo;
   onChange: (value: HeaderInfo) => void;
   schools: Record<SchoolId, SchoolInfo>;
-  onAddSchool: (id: SchoolId, school: SchoolInfo) => void;
+  onSaveSchool: (id: SchoolId, school: SchoolInfo) => void;
 }
 
-export function HeaderFieldsForm({ value, onChange, schools, onAddSchool }: HeaderFieldsFormProps) {
-  const [addingSchool, setAddingSchool] = useState(false);
+type SchoolModalMode = 'add' | 'edit' | null;
 
-  function handleAddSchool(school: SchoolInfo) {
-    const id = createSchoolId(school.nome, Object.keys(schools));
-    onAddSchool(id, school);
-    onChange({ ...value, escola: id });
-    setAddingSchool(false);
+export function HeaderFieldsForm({ value, onChange, schools, onSaveSchool }: HeaderFieldsFormProps) {
+  const [schoolModalMode, setSchoolModalMode] = useState<SchoolModalMode>(null);
+  const selectedSchool = schools[value.escola];
+
+  function handleSaveSchool(school: SchoolInfo) {
+    if (schoolModalMode === 'edit' && value.escola) {
+      onSaveSchool(value.escola, school);
+    } else {
+      const id = createSchoolId(school.nome, Object.keys(schools));
+      onSaveSchool(id, school);
+      onChange({ ...value, escola: id });
+    }
+    setSchoolModalMode(null);
   }
 
   return (
@@ -44,7 +51,17 @@ export function HeaderFieldsForm({ value, onChange, schools, onAddSchool }: Head
             </select>
             <button
               type="button"
-              onClick={() => setAddingSchool(true)}
+              onClick={() => setSchoolModalMode('edit')}
+              disabled={!selectedSchool}
+              aria-label="Editar escola selecionada"
+              title="Editar escola selecionada"
+              className="shrink-0 rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-400"
+            >
+              <Pencil size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setSchoolModalMode('add')}
               aria-label="Adicionar nova escola"
               title="Adicionar nova escola"
               className="shrink-0 rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
@@ -112,8 +129,14 @@ export function HeaderFieldsForm({ value, onChange, schools, onAddSchool }: Head
         </div>
       </div>
 
-      {addingSchool && (
-        <AddSchoolModal onAdd={handleAddSchool} onClose={() => setAddingSchool(false)} />
+      {schoolModalMode && (
+        <SchoolFormModal
+          title={schoolModalMode === 'edit' ? 'Editar Escola' : 'Nova Escola'}
+          submitLabel={schoolModalMode === 'edit' ? 'Salvar alterações' : 'Adicionar escola'}
+          initialSchool={schoolModalMode === 'edit' ? selectedSchool : undefined}
+          onSave={handleSaveSchool}
+          onClose={() => setSchoolModalMode(null)}
+        />
       )}
     </section>
   );

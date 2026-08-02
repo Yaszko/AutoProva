@@ -76,7 +76,7 @@ export default function App() {
   const effectiveModel = isValidModelFor(provider, model) ? model : defaultModelFor(provider);
   const schools = { ...SCHOOLS, ...customSchools };
 
-  function handleAddSchool(id: SchoolId, school: SchoolInfo) {
+  function handleSaveSchool(id: SchoolId, school: SchoolInfo) {
     setCustomSchools({ ...customSchools, [id]: school });
   }
 
@@ -143,7 +143,7 @@ export default function App() {
             value={header}
             onChange={setHeader}
             schools={schools}
-            onAddSchool={handleAddSchool}
+            onSaveSchool={handleSaveSchool}
           />
           <PromptArea
             prompt={prompt}
