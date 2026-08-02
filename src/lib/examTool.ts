@@ -8,6 +8,8 @@ Regras obrigatórias:
 - Só gere questões dissertativas ou inclua imagem na questão se o usuário pedir explicitamente esse comportamento no prompt.
 - Para questões dissertativas, o campo "alternativas" deve ser um array vazio.
 - Para questões de múltipla escolha, preencha "respostaCorreta" com a letra (a, b, c ou d) da alternativa correta.
+- Cada questão de múltipla escolha deve ter exatamente 4 alternativas, com letras a, b, c e d aparecendo uma única vez cada, e uma única resposta correta correspondente à letra marcada em "respostaCorreta".
+- Se o usuário fornecer uma sequência de gabarito específica, siga essa sequência exatamente, questão por questão, sem alterar a ordem nem duplicar letras.
 - Se o usuário não pedir explicitamente um gabarito específico, distribua as respostas corretas entre as letras a, b, c e d de forma variada ao longo da prova, evitando repetir a mesma letra em várias questões seguidas.
 - Para questões dissertativas, deixe "respostaCorreta" como string vazia "".
 - Se o usuário pedir explicitamente uma figura, preencha o campo opcional "imagem" com uma URL válida, data URI ou um bloco SVG inline. Essa imagem deve aparecer abaixo do enunciado e acima das alternativas.

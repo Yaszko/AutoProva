@@ -115,6 +115,52 @@ function stripBracedComma(text: string): string {
   return text.replace(/\{,\}/g, ",");
 }
 
+const MULTIPLE_CHOICE_LETTERS = ["a", "b", "c", "d"] as const;
+
+function normalizeAlternativas(questao: Questao): Alternativa[] {
+  const alternativas = questao.alternativas.map((alt, index) => ({
+    ...alt,
+    letra: (alt.letra || MULTIPLE_CHOICE_LETTERS[index]).toLowerCase(),
+    texto: stripBracedComma(alt.texto),
+  }));
+
+  const seen = new Set<string>();
+  const entradas: Alternativa[] = [];
+
+  for (const letra of MULTIPLE_CHOICE_LETTERS) {
+    const alternativa = alternativas.find(
+      (alt) => alt.letra === letra && !seen.has(letra),
+    );
+    if (alternativa) {
+      seen.add(letra);
+      entradas.push({ ...alternativa, letra });
+    } else {
+      entradas.push({ letra, texto: "" });
+    }
+  }
+
+  return entradas;
+}
+
+function normalizeQuestao(questao: Questao): Questao {
+  const alternativas = normalizeAlternativas(questao);
+  const respostaCorreta = questao.respostaCorreta?.toLowerCase();
+  const respostaValida = MULTIPLE_CHOICE_LETTERS.includes(
+    respostaCorreta as (typeof MULTIPLE_CHOICE_LETTERS)[number],
+  )
+    ? respostaCorreta
+    : (alternativas[0]?.letra ?? "a");
+
+  return {
+    ...questao,
+    enunciado: stripBracedComma(questao.enunciado),
+    imagem: questao.imagem ? stripBracedComma(questao.imagem) : undefined,
+    alternativas,
+    respostaCorreta: respostaValida,
+    resolucao: stripBracedComma(questao.resolucao),
+  };
+}
+
 export async function generateExam(
   apiKey: string,
   model: string,
@@ -146,16 +192,7 @@ export async function generateExam(
 function sanitizeExamData(data: ExamData): ExamData {
   return {
     assunto: stripBracedComma(data.assunto),
-    questoes: data.questoes.map((questao) => ({
-      ...questao,
-      enunciado: stripBracedComma(questao.enunciado),
-      imagem: questao.imagem ? stripBracedComma(questao.imagem) : undefined,
-      alternativas: questao.alternativas.map((alt) => ({
-        ...alt,
-        texto: stripBracedComma(alt.texto),
-      })),
-      resolucao: stripBracedComma(questao.resolucao),
-    })),
+    questoes: data.questoes.map((questao) => normalizeQuestao(questao)),
   };
 }
 
