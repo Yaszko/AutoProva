@@ -23,8 +23,8 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
   }
 
   return (
-    <section className="min-w-0 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-      <div className="mb-5 flex gap-1 border-b border-zinc-800">
+    <section className="flex h-full min-h-0 min-w-0 flex-col rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+      <div className="mb-5 flex shrink-0 gap-1 border-b border-zinc-800">
         <button
           type="button"
           onClick={() => setTab('preview')}
@@ -54,9 +54,11 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
         </button>
       </div>
 
-      {tab === 'preview' && <PreviewDocument exam={exam} header={header} mode="prova" />}
-      {tab === 'gabarito' && <PreviewDocument exam={exam} header={header} mode="gabarito" />}
-      {tab === 'html' && <HtmlCodeView exam={exam} header={header} />}
+      <div className="min-h-0 flex-1 overflow-hidden">
+        {tab === 'preview' && <PreviewDocument exam={exam} header={header} mode="prova" />}
+        {tab === 'gabarito' && <PreviewDocument exam={exam} header={header} mode="gabarito" />}
+        {tab === 'html' && <HtmlCodeView exam={exam} header={header} />}
+      </div>
     </section>
   );
 }

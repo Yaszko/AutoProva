@@ -251,7 +251,7 @@ export function QuestionEditor({
 
   if (!exam) {
     return (
-      <section className="flex h-full min-h-[400px] items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-center text-sm text-zinc-600 2xl:sticky 2xl:top-8">
+      <section className="flex h-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-center text-sm text-zinc-600">
         Gere uma prova para poder editar as questões e alternativas aqui.
       </section>
     );
@@ -348,7 +348,7 @@ export function QuestionEditor({
   }
 
   return (
-    <section className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 2xl:sticky 2xl:top-8 2xl:max-h-[calc(100vh-4rem)]">
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
       <div className="mb-2 shrink-0 space-y-2">
         <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-300">
           Editar Questões

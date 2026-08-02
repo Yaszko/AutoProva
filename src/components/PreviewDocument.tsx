@@ -84,8 +84,8 @@ export function PreviewDocument({ exam, header, mode = 'prova' }: PreviewDocumen
   }
 
   return (
-    <div>
-      <div className="mb-3 flex justify-end">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="mb-3 flex shrink-0 justify-end">
         <button
           type="button"
           onClick={handleDownloadPdf}
@@ -97,8 +97,10 @@ export function PreviewDocument({ exam, header, mode = 'prova' }: PreviewDocumen
         </button>
       </div>
 
-      <div className="mx-auto max-w-2xl overflow-hidden rounded-sm shadow-xl">
-        <ExamPaper ref={paperRef} exam={exam} header={header} mode={mode} />
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-2xl overflow-hidden rounded-sm shadow-xl">
+          <ExamPaper ref={paperRef} exam={exam} header={header} mode={mode} />
+        </div>
       </div>
     </div>
   );

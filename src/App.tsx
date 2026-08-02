@@ -48,8 +48,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <header className="border-b border-zinc-900 px-6 py-4">
+    <div className="flex h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-100">
+      <header className="shrink-0 border-b border-zinc-900 px-6 py-4">
         <div className="mx-auto flex max-w-6xl items-center gap-2">
           <GraduationCap size={22} />
           <h1 className="text-lg font-semibold">AutoProva</h1>
@@ -57,29 +57,27 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[96rem] px-6 py-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[360px_1fr] 2xl:grid-cols-[360px_1fr_320px]">
-          <div className="space-y-6">
-            <ConfigPanel apiKey={apiKey} onApiKeyChange={setApiKey} model={model} onModelChange={handleModelChange} />
-            <HeaderFieldsForm value={header} onChange={setHeader} />
-            <PromptArea
-              prompt={prompt}
-              onPromptChange={setPrompt}
-              numQuestoes={numQuestoes}
-              onNumQuestoesChange={setNumQuestoes}
-              onGenerate={handleGenerate}
-              loading={loading}
-            />
-            {error && <ErrorAlert message={error} onDismiss={() => setError(null)} />}
-          </div>
+      <main className="mx-auto grid w-full min-h-0 max-w-[96rem] flex-1 grid-cols-1 grid-rows-[1fr_1fr_1fr] gap-6 overflow-hidden px-6 py-8 lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_1fr] 2xl:grid-cols-[360px_1fr_320px] 2xl:grid-rows-1">
+        <div className="min-h-0 space-y-6 overflow-y-auto pr-1">
+          <ConfigPanel apiKey={apiKey} onApiKeyChange={setApiKey} model={model} onModelChange={handleModelChange} />
+          <HeaderFieldsForm value={header} onChange={setHeader} />
+          <PromptArea
+            prompt={prompt}
+            onPromptChange={setPrompt}
+            numQuestoes={numQuestoes}
+            onNumQuestoesChange={setNumQuestoes}
+            onGenerate={handleGenerate}
+            loading={loading}
+          />
+          {error && <ErrorAlert message={error} onDismiss={() => setError(null)} />}
+        </div>
 
-          <div className="min-w-0">
-            <ResultPanel exam={exam} header={header} />
-          </div>
+        <div className="min-h-0 min-w-0 overflow-hidden">
+          <ResultPanel exam={exam} header={header} />
+        </div>
 
-          <div className="col-span-full min-w-0 2xl:col-span-1">
-            <QuestionEditor exam={exam} onChange={setExam} apiKey={apiKey} model={model} />
-          </div>
+        <div className="col-span-full min-h-0 min-w-0 overflow-hidden 2xl:col-span-1">
+          <QuestionEditor exam={exam} onChange={setExam} apiKey={apiKey} model={model} />
         </div>
       </main>
     </div>
