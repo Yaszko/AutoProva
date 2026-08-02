@@ -4,11 +4,13 @@ export function buildSystemPrompt(numQuestoes: number): string {
 Regras obrigatórias:
 - A avaliação completa (as ${numQuestoes} questões, incluindo enunciados e alternativas) NUNCA deve ultrapassar 2 páginas A4 impressas, a menos que o usuário peça explicitamente mais espaço ou enunciados mais longos no prompt. Para respeitar esse limite, escreva enunciados e alternativas de forma objetiva e concisa.
 - Gere exatamente ${numQuestoes} questões, numeradas de 1 a ${numQuestoes}, seguindo o assunto, o nível de dificuldade e as orientações descritas pelo usuário.
-- Combine questões de múltipla escolha ("multipla_escolha", com exatamente 4 alternativas, de "a" a "d") e questões dissertativas ("dissertativa"), a menos que o usuário peça explicitamente apenas um dos dois tipos.
+- Regra de prioridade: se o usuário não pedir explicitamente outra coisa, gere apenas questões objetivas, do tipo "multipla_escolha", com exatamente 4 alternativas ("a" a "d") e sem imagem.
+- Só gere questões dissertativas ou inclua imagem na questão se o usuário pedir explicitamente esse comportamento no prompt.
 - Para questões dissertativas, o campo "alternativas" deve ser um array vazio.
 - Para questões de múltipla escolha, preencha "respostaCorreta" com a letra (a, b, c ou d) da alternativa correta.
+- Se o usuário não pedir explicitamente um gabarito específico, distribua as respostas corretas entre as letras a, b, c e d de forma variada ao longo da prova, evitando repetir a mesma letra em várias questões seguidas.
 - Para questões dissertativas, deixe "respostaCorreta" como string vazia "".
-- Se a questão precisar de uma figura para ajudar na visualização, preencha o campo opcional "imagem" com uma URL válida, data URI ou um bloco SVG inline. Essa imagem deve aparecer abaixo do enunciado e acima das alternativas.
+- Se o usuário pedir explicitamente uma figura, preencha o campo opcional "imagem" com uma URL válida, data URI ou um bloco SVG inline. Essa imagem deve aparecer abaixo do enunciado e acima das alternativas.
 - Quando houver imagem, revise a coerência entre o enunciado, a figura e as alternativas antes de responder: a imagem deve corresponder fielmente ao texto do problema, mostrar as medidas e o contexto corretos, e não contradizer a pergunta nem a resposta esperada.
 - Ao revisar a imagem, verifique também a formatação visual: os rótulos de medidas devem ficar fora da linha principal, sem sobrepor a diagonal, sem colar em bordas, sem ficar sobre os elementos do desenho e sem reduzir a legibilidade. O texto deve estar claramente posicionado, com boa separação visual e alinhamento adequado.
 - Se a imagem estiver inconsistente ou visualmente mal formatada, corrija a figura antes de finalizar a resposta. Não entregue uma imagem que pareça desajeitada, com sobreposição de texto, elementos sobrepostos ou com rótulos ilegíveis.
