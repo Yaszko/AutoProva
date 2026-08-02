@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import { Download, Loader2 } from 'lucide-react';
 import { ExamData, HeaderInfo } from '../types';
 import { buildDownloadFileName } from '../lib/fileName';
+import { SchoolId, SchoolInfo } from '../lib/schoolInfo';
 import { ExamPaper, ExamPaperMode } from './ExamPaper';
 
 const PDF_MARGIN_MM = 10;
@@ -65,10 +66,11 @@ async function renderElementToPdf(element: HTMLElement, fileName: string) {
 interface PreviewDocumentProps {
   exam: ExamData;
   header: HeaderInfo;
+  schools: Record<SchoolId, SchoolInfo>;
   mode?: ExamPaperMode;
 }
 
-export function PreviewDocument({ exam, header, mode = 'prova' }: PreviewDocumentProps) {
+export function PreviewDocument({ exam, header, schools, mode = 'prova' }: PreviewDocumentProps) {
   const paperRef = useRef<HTMLDivElement>(null);
   const [generating, setGenerating] = useState(false);
 
@@ -101,7 +103,7 @@ export function PreviewDocument({ exam, header, mode = 'prova' }: PreviewDocumen
           e sim scrolada horizontalmente, para não quebrar o layout impresso. */}
       <div className="overflow-x-auto lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         <div className="mx-auto w-full min-w-[42rem] max-w-2xl overflow-hidden rounded-sm shadow-xl">
-          <ExamPaper ref={paperRef} exam={exam} header={header} mode={mode} />
+          <ExamPaper ref={paperRef} exam={exam} header={header} schools={schools} mode={mode} />
         </div>
       </div>
     </div>

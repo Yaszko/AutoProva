@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { ExamData, HeaderInfo } from '../types';
+import { SchoolId, SchoolInfo } from '../lib/schoolInfo';
 import { PreviewDocument } from './PreviewDocument';
 import { EmptyState } from './EmptyState';
 
 interface ResultPanelProps {
   exam: ExamData | null;
   header: HeaderInfo;
+  schools: Record<SchoolId, SchoolInfo>;
 }
 
 type Tab = 'preview' | 'gabarito';
 
-export function ResultPanel({ exam, header }: ResultPanelProps) {
+export function ResultPanel({ exam, header, schools }: ResultPanelProps) {
   const [tab, setTab] = useState<Tab>('preview');
 
   if (!exam) {
@@ -45,8 +47,8 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
       </div>
 
       <div className="lg:min-h-0 lg:flex-1 lg:overflow-hidden">
-        {tab === 'preview' && <PreviewDocument exam={exam} header={header} mode="prova" />}
-        {tab === 'gabarito' && <PreviewDocument exam={exam} header={header} mode="gabarito" />}
+        {tab === 'preview' && <PreviewDocument exam={exam} header={header} schools={schools} mode="prova" />}
+        {tab === 'gabarito' && <PreviewDocument exam={exam} header={header} schools={schools} mode="gabarito" />}
       </div>
     </section>
   );

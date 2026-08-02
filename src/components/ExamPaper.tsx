@@ -1,7 +1,7 @@
 import { forwardRef, useState } from "react";
 import { ExamData, HeaderInfo, Questao } from "../types";
 import { buildExamTitle } from "../lib/examTitle";
-import { EMAIL, ENDERECO, INSTITUICAO, TELEFONE } from "../lib/schoolInfo";
+import { resolveLogoSrc, SchoolId, SchoolInfo } from "../lib/schoolInfo";
 import { MathText } from "./MathText";
 
 export type ExamPaperMode = "prova" | "gabarito";
@@ -9,6 +9,7 @@ export type ExamPaperMode = "prova" | "gabarito";
 interface ExamPaperProps {
   exam: ExamData;
   header: HeaderInfo;
+  schools: Record<SchoolId, SchoolInfo>;
   mode?: ExamPaperMode;
 }
 
@@ -119,27 +120,32 @@ function GabaritoBox({
 }
 
 export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(
-  function ExamPaper({ exam, header, mode = "prova" }, ref) {
+  function ExamPaper({ exam, header, schools, mode = "prova" }, ref) {
+    const escola = schools[header.escola] ?? Object.values(schools)[0];
     return (
       <div ref={ref} className="bg-zinc-50 p-8 text-zinc-900">
         <div className="relative mb-3 min-h-16">
-          <div className="absolute left-0 top-0">
-            <LogoImage
-              src={`${import.meta.env.BASE_URL}logo_escola.png`}
-              alt="logo_escola.png"
-            />
-          </div>
-          <div className="absolute right-0 top-0">
-            <LogoImage
-              src={`${import.meta.env.BASE_URL}logo_apg.png`}
-              alt="logo_apg.png"
-            />
-          </div>
+          {escola.logoEsquerda && (
+            <div className="absolute left-0 top-0">
+              <LogoImage
+                src={resolveLogoSrc(escola.logoEsquerda)}
+                alt={`Logo ${escola.nome}`}
+              />
+            </div>
+          )}
+          {escola.logoDireita && (
+            <div className="absolute right-0 top-0">
+              <LogoImage
+                src={resolveLogoSrc(escola.logoDireita)}
+                alt={`Logo ${escola.nome}`}
+              />
+            </div>
+          )}
           <div className="mx-auto max-w-[calc(100%-9rem)] text-center text-[0.625rem]">
-            <p className="text-sm font-bold">{INSTITUICAO}</p>
-            <p>{ENDERECO}</p>
+            <p className="text-sm font-bold">{escola.instituicao}</p>
+            <p>{escola.endereco}</p>
             <p>
-              Fone: {TELEFONE} &nbsp;&nbsp; e-mail – {EMAIL}
+              Fone: {escola.telefone} &nbsp;&nbsp; e-mail – {escola.email}
             </p>
           </div>
         </div>

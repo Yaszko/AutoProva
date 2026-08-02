@@ -1,3 +1,5 @@
+import { SchoolId } from "./lib/schoolInfo";
+
 export type LlmProvider = "anthropic" | "google";
 
 export interface Alternativa {
@@ -28,6 +30,7 @@ export interface ExamData {
 export type TipoAvaliacao = "avaliacao" | "recuperacao";
 
 export interface HeaderInfo {
+  escola: SchoolId;
   professor: string;
   turma: string;
   tipo: TipoAvaliacao;

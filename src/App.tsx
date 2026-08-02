@@ -10,8 +10,10 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { generateExam, LlmApiError } from './lib/llmClient';
 import { defaultModelFor, isValidModelFor } from './lib/llmProviders';
 import { ExamData, HeaderInfo, LlmProvider } from './types';
+import { DEFAULT_SCHOOL, SCHOOLS, SchoolId, SchoolInfo } from './lib/schoolInfo';
 
 const DEFAULT_HEADER: HeaderInfo = {
+  escola: DEFAULT_SCHOOL,
   professor: '',
   turma: '',
   tipo: 'avaliacao',
@@ -35,6 +37,23 @@ const DEFAULT_API_KEYS: Record<LlmProvider, string> = {
   google: '',
 };
 
+const HEADER_FIELD_LABELS: [key: keyof Pick<HeaderInfo, 'professor' | 'turma' | 'valor'>, label: string][] = [
+  ['professor', 'professor(a)'],
+  ['turma', 'turma'],
+  ['valor', 'valor'],
+];
+
+// Sem escola padrão, o cabeçalho só fica completo quando o professor preenche tudo (inclusive
+// escolhe/cadastra uma escola). Retorna os rótulos, em português, dos campos ainda vazios.
+function missingHeaderFields(header: HeaderInfo, schools: Record<SchoolId, SchoolInfo>): string[] {
+  const missing: string[] = [];
+  if (!header.escola || !schools[header.escola]) missing.push('escola');
+  for (const [key, label] of HEADER_FIELD_LABELS) {
+    if (!header[key].trim()) missing.push(label);
+  }
+  return missing;
+}
+
 export default function App() {
   const [provider, setProvider] = useLocalStorage<LlmProvider>('autoprova_provider', 'anthropic');
   const [apiKeys, setApiKeys] = useLocalStorage<Record<LlmProvider, string>>(
@@ -42,7 +61,11 @@ export default function App() {
     DEFAULT_API_KEYS,
   );
   const [model, setModel] = useLocalStorage('autoprova_model', defaultModelFor(provider));
-  const [header, setHeader] = useLocalStorage<HeaderInfo>('autoprova_header_v3', DEFAULT_HEADER);
+  const [header, setHeader] = useLocalStorage<HeaderInfo>('autoprova_header_v4', DEFAULT_HEADER);
+  const [customSchools, setCustomSchools] = useLocalStorage<Record<SchoolId, SchoolInfo>>(
+    'autoprova_custom_schools',
+    {},
+  );
   const [prompt, setPrompt] = useState('');
   const [numQuestoes, setNumQuestoes] = useState(10);
   const [exam, setExam] = useState<ExamData | null>(null);
@@ -51,6 +74,11 @@ export default function App() {
 
   const apiKey = apiKeys[provider] ?? '';
   const effectiveModel = isValidModelFor(provider, model) ? model : defaultModelFor(provider);
+  const schools = { ...SCHOOLS, ...customSchools };
+
+  function handleAddSchool(id: SchoolId, school: SchoolInfo) {
+    setCustomSchools({ ...customSchools, [id]: school });
+  }
 
   function handleProviderChange(nextProvider: LlmProvider) {
     setProvider(nextProvider);
@@ -68,6 +96,13 @@ export default function App() {
   }
 
   async function handleGenerate() {
+    const missing = missingHeaderFields(header, schools);
+    if (missing.length > 0) {
+      setError(
+        `Preencha os dados do cabeçalho antes de gerar a prova: ${missing.join(', ')}.`,
+      );
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -104,7 +139,12 @@ export default function App() {
             model={effectiveModel}
             onModelChange={handleModelChange}
           />
-          <HeaderFieldsForm value={header} onChange={setHeader} />
+          <HeaderFieldsForm
+            value={header}
+            onChange={setHeader}
+            schools={schools}
+            onAddSchool={handleAddSchool}
+          />
           <PromptArea
             prompt={prompt}
             onPromptChange={setPrompt}
@@ -117,7 +157,7 @@ export default function App() {
         </div>
 
         <div className="min-w-0 lg:min-h-0 lg:overflow-hidden">
-          <ResultPanel exam={exam} header={header} />
+          <ResultPanel exam={exam} header={header} schools={schools} />
         </div>
 
         <div className="col-span-full min-w-0 lg:min-h-0 lg:overflow-hidden 2xl:col-span-1">
