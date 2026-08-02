@@ -10,7 +10,7 @@ export function HeaderFieldsForm({ value, onChange }: HeaderFieldsFormProps) {
     <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
       <h2 className="mb-4 text-sm font-medium uppercase tracking-wide text-zinc-300">Dados do Cabeçalho</h2>
       <div className="grid grid-cols-2 gap-3">
-        <div>
+        <div className="min-w-0">
           <label htmlFor="professor" className="mb-1.5 block text-xs text-zinc-400">
             Professor(a)
           </label>
@@ -24,7 +24,7 @@ export function HeaderFieldsForm({ value, onChange }: HeaderFieldsFormProps) {
           />
         </div>
 
-        <div>
+        <div className="min-w-0">
           <label htmlFor="turma" className="mb-1.5 block text-xs text-zinc-400">
             Turma
           </label>
@@ -38,7 +38,7 @@ export function HeaderFieldsForm({ value, onChange }: HeaderFieldsFormProps) {
           />
         </div>
 
-        <div>
+        <div className="min-w-0">
           <label htmlFor="tipo" className="mb-1.5 block text-xs text-zinc-400">
             Tipo
           </label>
@@ -53,7 +53,7 @@ export function HeaderFieldsForm({ value, onChange }: HeaderFieldsFormProps) {
           </select>
         </div>
 
-        <div>
+        <div className="min-w-0">
           <label htmlFor="valor" className="mb-1.5 block text-xs text-zinc-400">
             Valor
           </label>

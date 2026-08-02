@@ -251,7 +251,7 @@ export function QuestionEditor({
 
   if (!exam) {
     return (
-      <section className="flex h-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-center text-sm text-zinc-600">
+      <section className="flex min-h-[160px] items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-center text-sm text-zinc-600 lg:h-full lg:min-h-0">
         Gere uma prova para poder editar as questões e alternativas aqui.
       </section>
     );
@@ -348,8 +348,8 @@ export function QuestionEditor({
   }
 
   return (
-    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-      <div className="mb-2 shrink-0 space-y-2">
+    <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:overflow-hidden">
+      <div className="mb-2 space-y-2 lg:shrink-0">
         <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-300">
           Editar Questões
         </h2>
@@ -388,7 +388,7 @@ export function QuestionEditor({
         </div>
       )}
 
-      <div className="-mr-2 flex-1 space-y-4 overflow-y-auto pr-2">
+      <div className="space-y-4 lg:-mr-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-2">
         {exam.questoes.map((questao) => (
           <QuestionCard
             key={questao.numero}

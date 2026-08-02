@@ -16,19 +16,19 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
 
   if (!exam) {
     return (
-      <section className="h-full rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 lg:h-full">
         <EmptyState />
       </section>
     );
   }
 
   return (
-    <section className="flex h-full min-h-0 min-w-0 flex-col rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-      <div className="mb-5 flex shrink-0 gap-1 border-b border-zinc-800">
+    <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+      <div className="mb-5 flex gap-1 overflow-x-auto border-b border-zinc-800 lg:shrink-0">
         <button
           type="button"
           onClick={() => setTab('preview')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
             tab === 'preview' ? 'border-b-2 border-zinc-100 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'
           }`}
         >
@@ -37,7 +37,7 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
         <button
           type="button"
           onClick={() => setTab('gabarito')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
             tab === 'gabarito' ? 'border-b-2 border-zinc-100 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'
           }`}
         >
@@ -46,7 +46,7 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
         <button
           type="button"
           onClick={() => setTab('html')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`shrink-0 whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
             tab === 'html' ? 'border-b-2 border-zinc-100 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'
           }`}
         >
@@ -54,7 +54,7 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="lg:min-h-0 lg:flex-1 lg:overflow-hidden">
         {tab === 'preview' && <PreviewDocument exam={exam} header={header} mode="prova" />}
         {tab === 'gabarito' && <PreviewDocument exam={exam} header={header} mode="gabarito" />}
         {tab === 'html' && <HtmlCodeView exam={exam} header={header} />}

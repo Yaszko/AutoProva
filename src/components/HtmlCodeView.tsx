@@ -39,8 +39,8 @@ export function HtmlCodeView({ exam, header }: HtmlCodeViewProps) {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col space-y-3">
-      <div className="flex shrink-0 justify-end gap-2">
+    <div className="space-y-3 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+      <div className="flex justify-end gap-2 lg:shrink-0">
         <button
           type="button"
           onClick={handleCopy}
@@ -58,7 +58,7 @@ export function HtmlCodeView({ exam, header }: HtmlCodeViewProps) {
           Baixar .html
         </button>
       </div>
-      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto rounded-lg border border-zinc-800">
+      <div className="min-w-0 overflow-y-auto rounded-lg border border-zinc-800 lg:min-h-0 lg:flex-1">
         <SyntaxHighlighter
           language="markup"
           style={vscDarkPlus}

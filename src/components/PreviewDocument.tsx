@@ -84,8 +84,8 @@ export function PreviewDocument({ exam, header, mode = 'prova' }: PreviewDocumen
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="mb-3 flex shrink-0 justify-end">
+    <div className="lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+      <div className="mb-3 flex justify-end lg:shrink-0">
         <button
           type="button"
           onClick={handleDownloadPdf}
@@ -97,8 +97,10 @@ export function PreviewDocument({ exam, header, mode = 'prova' }: PreviewDocumen
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-2xl overflow-hidden rounded-sm shadow-xl">
+      {/* A folha simula um A4 com largura fixa (42rem) — em telas estreitas ela não é espremida,
+          e sim scrolada horizontalmente, para não quebrar o layout impresso. */}
+      <div className="overflow-x-auto lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        <div className="mx-auto w-full min-w-[42rem] max-w-2xl overflow-hidden rounded-sm shadow-xl">
           <ExamPaper ref={paperRef} exam={exam} header={header} mode={mode} />
         </div>
       </div>

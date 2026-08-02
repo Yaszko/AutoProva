@@ -48,17 +48,19 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-100">
-      <header className="shrink-0 border-b border-zinc-900 px-6 py-4">
+    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 lg:h-screen lg:overflow-hidden">
+      <header className="shrink-0 border-b border-zinc-900 px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-6xl items-center gap-2">
           <GraduationCap size={22} />
           <h1 className="text-lg font-semibold">AutoProva</h1>
-          <span className="text-sm text-zinc-500">gerador de avaliações com IA</span>
+          <span className="hidden text-sm text-zinc-500 sm:inline">gerador de avaliações com IA</span>
         </div>
       </header>
 
-      <main className="mx-auto grid w-full min-h-0 max-w-[96rem] flex-1 grid-cols-1 grid-rows-[1fr_1fr_1fr] gap-6 overflow-hidden px-6 py-8 lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_1fr] 2xl:grid-cols-[360px_1fr_320px] 2xl:grid-rows-1">
-        <div className="min-h-0 space-y-6 overflow-y-auto pr-1">
+      {/* Abaixo de lg, a página flui e scrola normalmente (melhor para celular). A partir de lg, a
+          página fica travada e cada bloco (config, prévia, editor) scrola internamente. */}
+      <main className="mx-auto grid w-full max-w-[96rem] grid-cols-1 gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:min-h-0 lg:flex-1 lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_1fr] lg:overflow-hidden 2xl:grid-cols-[360px_1fr_320px] 2xl:grid-rows-1">
+        <div className="space-y-6 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
           <ConfigPanel apiKey={apiKey} onApiKeyChange={setApiKey} model={model} onModelChange={handleModelChange} />
           <HeaderFieldsForm value={header} onChange={setHeader} />
           <PromptArea
@@ -72,11 +74,11 @@ export default function App() {
           {error && <ErrorAlert message={error} onDismiss={() => setError(null)} />}
         </div>
 
-        <div className="min-h-0 min-w-0 overflow-hidden">
+        <div className="min-w-0 lg:min-h-0 lg:overflow-hidden">
           <ResultPanel exam={exam} header={header} />
         </div>
 
-        <div className="col-span-full min-h-0 min-w-0 overflow-hidden 2xl:col-span-1">
+        <div className="col-span-full min-w-0 lg:min-h-0 lg:overflow-hidden 2xl:col-span-1">
           <QuestionEditor exam={exam} onChange={setExam} apiKey={apiKey} model={model} />
         </div>
       </main>
