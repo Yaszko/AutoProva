@@ -145,7 +145,7 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(
             <p className="text-sm font-bold">{escola.instituicao}</p>
             <p>{escola.endereco}</p>
             <p>
-              Fone: {escola.telefone} &nbsp;&nbsp; e-mail – {escola.email}
+              Telefone: {escola.telefone} &nbsp;&nbsp; e-mail – {escola.email}
             </p>
           </div>
         </div>
