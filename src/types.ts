@@ -1,3 +1,5 @@
+export type LlmProvider = "anthropic" | "google";
+
 export interface Alternativa {
   letra: string;
   texto: string;

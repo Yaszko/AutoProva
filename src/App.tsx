@@ -7,8 +7,9 @@ import { ResultPanel } from './components/ResultPanel';
 import { QuestionEditor } from './components/QuestionEditor';
 import { ErrorAlert } from './components/ErrorAlert';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { generateExam, AnthropicApiError } from './lib/anthropicClient';
-import { ExamData, HeaderInfo } from './types';
+import { generateExam, LlmApiError } from './lib/llmClient';
+import { defaultModelFor, isValidModelFor } from './lib/llmProviders';
+import { ExamData, HeaderInfo, LlmProvider } from './types';
 
 const DEFAULT_HEADER: HeaderInfo = {
   professor: '',
@@ -17,15 +18,49 @@ const DEFAULT_HEADER: HeaderInfo = {
   valor: '',
 };
 
+// Migração única: versões anteriores guardavam uma única chave (sempre da Anthropic) sob
+// "autoprova_api_key". Reaproveita esse valor como a chave da Anthropic no novo formato
+// por provedor, para o professor não precisar digitar a chave de novo.
+function legacyAnthropicApiKey(): string {
+  try {
+    const stored = window.localStorage.getItem('autoprova_api_key');
+    return stored !== null ? (JSON.parse(stored) as string) : '';
+  } catch {
+    return '';
+  }
+}
+
+const DEFAULT_API_KEYS: Record<LlmProvider, string> = {
+  anthropic: legacyAnthropicApiKey(),
+  google: '',
+};
+
 export default function App() {
-  const [apiKey, setApiKey] = useLocalStorage('autoprova_api_key', '');
-  const [model, setModel] = useLocalStorage('autoprova_model', 'claude-sonnet-5');
+  const [provider, setProvider] = useLocalStorage<LlmProvider>('autoprova_provider', 'anthropic');
+  const [apiKeys, setApiKeys] = useLocalStorage<Record<LlmProvider, string>>(
+    'autoprova_api_keys',
+    DEFAULT_API_KEYS,
+  );
+  const [model, setModel] = useLocalStorage('autoprova_model', defaultModelFor(provider));
   const [header, setHeader] = useLocalStorage<HeaderInfo>('autoprova_header_v3', DEFAULT_HEADER);
   const [prompt, setPrompt] = useState('');
   const [numQuestoes, setNumQuestoes] = useState(10);
   const [exam, setExam] = useState<ExamData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const apiKey = apiKeys[provider] ?? '';
+  const effectiveModel = isValidModelFor(provider, model) ? model : defaultModelFor(provider);
+
+  function handleProviderChange(nextProvider: LlmProvider) {
+    setProvider(nextProvider);
+    setModel(defaultModelFor(nextProvider));
+    setError(null);
+  }
+
+  function handleApiKeyChange(nextApiKey: string) {
+    setApiKeys({ ...apiKeys, [provider]: nextApiKey });
+  }
 
   function handleModelChange(nextModel: string) {
     setModel(nextModel);
@@ -36,11 +71,11 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const result = await generateExam(apiKey, model, prompt, numQuestoes);
+      const result = await generateExam(provider, apiKey, effectiveModel, prompt, numQuestoes);
       setExam(result);
     } catch (err) {
       const message =
-        err instanceof AnthropicApiError ? err.message : 'Ocorreu um erro inesperado ao gerar a prova.';
+        err instanceof LlmApiError ? err.message : 'Ocorreu um erro inesperado ao gerar a prova.';
       setError(message);
     } finally {
       setLoading(false);
@@ -61,7 +96,14 @@ export default function App() {
           página fica travada e cada bloco (config, prévia, editor) scrola internamente. */}
       <main className="mx-auto grid w-full max-w-[96rem] grid-cols-1 gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:min-h-0 lg:flex-1 lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_1fr] lg:overflow-hidden 2xl:grid-cols-[360px_1fr_320px] 2xl:grid-rows-1">
         <div className="space-y-6 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
-          <ConfigPanel apiKey={apiKey} onApiKeyChange={setApiKey} model={model} onModelChange={handleModelChange} />
+          <ConfigPanel
+            provider={provider}
+            onProviderChange={handleProviderChange}
+            apiKey={apiKey}
+            onApiKeyChange={handleApiKeyChange}
+            model={effectiveModel}
+            onModelChange={handleModelChange}
+          />
           <HeaderFieldsForm value={header} onChange={setHeader} />
           <PromptArea
             prompt={prompt}
@@ -79,7 +121,13 @@ export default function App() {
         </div>
 
         <div className="col-span-full min-w-0 lg:min-h-0 lg:overflow-hidden 2xl:col-span-1">
-          <QuestionEditor exam={exam} onChange={setExam} apiKey={apiKey} model={model} />
+          <QuestionEditor
+            exam={exam}
+            onChange={setExam}
+            provider={provider}
+            apiKey={apiKey}
+            model={effectiveModel}
+          />
         </div>
       </main>
     </div>

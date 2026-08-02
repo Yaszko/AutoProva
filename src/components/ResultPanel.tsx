@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ExamData, HeaderInfo } from '../types';
 import { PreviewDocument } from './PreviewDocument';
-import { HtmlCodeView } from './HtmlCodeView';
 import { EmptyState } from './EmptyState';
 
 interface ResultPanelProps {
@@ -9,7 +8,7 @@ interface ResultPanelProps {
   header: HeaderInfo;
 }
 
-type Tab = 'preview' | 'gabarito' | 'html';
+type Tab = 'preview' | 'gabarito';
 
 export function ResultPanel({ exam, header }: ResultPanelProps) {
   const [tab, setTab] = useState<Tab>('preview');
@@ -43,21 +42,11 @@ export function ResultPanel({ exam, header }: ResultPanelProps) {
         >
           Prévia do Gabarito
         </button>
-        <button
-          type="button"
-          onClick={() => setTab('html')}
-          className={`shrink-0 whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
-            tab === 'html' ? 'border-b-2 border-zinc-100 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'
-          }`}
-        >
-          Código HTML
-        </button>
       </div>
 
       <div className="lg:min-h-0 lg:flex-1 lg:overflow-hidden">
         {tab === 'preview' && <PreviewDocument exam={exam} header={header} mode="prova" />}
         {tab === 'gabarito' && <PreviewDocument exam={exam} header={header} mode="gabarito" />}
-        {tab === 'html' && <HtmlCodeView exam={exam} header={header} />}
       </div>
     </section>
   );

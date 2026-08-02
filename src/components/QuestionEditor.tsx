@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Loader2, Plus, Sparkles, X } from "lucide-react";
-import { AnthropicApiError, editQuestion } from "../lib/anthropicClient";
-import { ExamData, Questao, TipoQuestao } from "../types";
+import { LlmApiError, editQuestion } from "../lib/llmClient";
+import { ExamData, LlmProvider, Questao, TipoQuestao } from "../types";
 
 interface QuestionEditorProps {
   exam: ExamData | null;
   onChange: (exam: ExamData) => void;
+  provider: LlmProvider;
   apiKey: string;
   model: string;
 }
@@ -61,7 +62,7 @@ function removeQuestao(exam: ExamData, numero: number): ExamData {
 }
 
 function errorMessage(err: unknown): string {
-  return err instanceof AnthropicApiError
+  return err instanceof LlmApiError
     ? err.message
     : "Ocorreu um erro inesperado ao consultar a IA.";
 }
@@ -244,6 +245,7 @@ function QuestionCard({
 export function QuestionEditor({
   exam,
   onChange,
+  provider,
   apiKey,
   model,
 }: QuestionEditorProps) {
@@ -328,7 +330,7 @@ export function QuestionEditor({
     const questaoAtual = currentExam.questoes.find(
       (questao) => questao.numero === numero,
     );
-    const result = await editQuestion(apiKey, model, instruction, {
+    const result = await editQuestion(provider, apiKey, model, instruction, {
       assunto: currentExam.assunto,
       questaoAtual,
     });
@@ -341,7 +343,7 @@ export function QuestionEditor({
   }
 
   async function handleAiAddQuestao(instruction: string) {
-    const result = await editQuestion(apiKey, model, instruction, {
+    const result = await editQuestion(provider, apiKey, model, instruction, {
       assunto: currentExam.assunto,
     });
     onChange(addQuestao(currentExam, result));

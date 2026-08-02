@@ -1,21 +1,27 @@
 import { useState } from 'react';
 import { Eye, EyeOff, KeyRound } from 'lucide-react';
-
-const MODELS = [
-  { id: 'claude-sonnet-5', label: 'Claude Sonnet 5 (recomendado)' },
-  { id: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5 (mais rápido)' },
-  { id: 'claude-opus-5', label: 'Claude Opus 5 (mais elaborado)' },
-];
+import { LlmProvider } from '../types';
+import { getProviderConfig, LLM_PROVIDERS } from '../lib/llmProviders';
 
 interface ConfigPanelProps {
+  provider: LlmProvider;
+  onProviderChange: (value: LlmProvider) => void;
   apiKey: string;
   onApiKeyChange: (value: string) => void;
   model: string;
   onModelChange: (value: string) => void;
 }
 
-export function ConfigPanel({ apiKey, onApiKeyChange, model, onModelChange }: ConfigPanelProps) {
+export function ConfigPanel({
+  provider,
+  onProviderChange,
+  apiKey,
+  onApiKeyChange,
+  model,
+  onModelChange,
+}: ConfigPanelProps) {
   const [visible, setVisible] = useState(false);
+  const providerConfig = getProviderConfig(provider);
 
   return (
     <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
@@ -26,8 +32,26 @@ export function ConfigPanel({ apiKey, onApiKeyChange, model, onModelChange }: Co
 
       <div className="space-y-4">
         <div>
+          <label htmlFor="provider" className="mb-1.5 block text-xs text-zinc-400">
+            Provedor de IA
+          </label>
+          <select
+            id="provider"
+            value={provider}
+            onChange={(e) => onProviderChange(e.target.value as LlmProvider)}
+            className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none"
+          >
+            {LLM_PROVIDERS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label htmlFor="api-key" className="mb-1.5 block text-xs text-zinc-400">
-            Anthropic API Key
+            {providerConfig.label} API Key
           </label>
           <div className="relative">
             <input
@@ -35,7 +59,7 @@ export function ConfigPanel({ apiKey, onApiKeyChange, model, onModelChange }: Co
               type={visible ? 'text' : 'password'}
               value={apiKey}
               onChange={(e) => onApiKeyChange(e.target.value)}
-              placeholder="sk-ant-..."
+              placeholder={providerConfig.apiKeyPlaceholder}
               autoComplete="off"
               spellCheck={false}
               className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 pr-10 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
@@ -49,9 +73,7 @@ export function ConfigPanel({ apiKey, onApiKeyChange, model, onModelChange }: Co
               {visible ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <p className="mt-1.5 text-xs text-zinc-600">
-            Sua chave é salva apenas no seu navegador (localStorage) e enviada diretamente à Anthropic.
-          </p>
+          <p className="mt-1.5 text-xs text-zinc-600">{providerConfig.apiKeyHelp}</p>
         </div>
 
         <div>
@@ -64,7 +86,7 @@ export function ConfigPanel({ apiKey, onApiKeyChange, model, onModelChange }: Co
             onChange={(e) => onModelChange(e.target.value)}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none"
           >
-            {MODELS.map((m) => (
+            {providerConfig.models.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.label}
               </option>
