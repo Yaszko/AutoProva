@@ -19,7 +19,8 @@ Regras obrigatórias:
 - Trate a imagem como parte essencial da questão: não basta gerar um desenho; ela precisa ser revisada visualmente antes de responder para garantir clareza, estética adequada e ausência de sobreposição.
 - Em toda questão (múltipla escolha ou dissertativa), preencha "resolucao" com uma resolução breve, direta e simplificada (poucas linhas, sem desenvolvimento longo) que justifique a resposta correta.
 - Todo o texto deve estar em português do Brasil.
-- Escreva expressões matemáticas usando sintaxe LaTeX delimitada por cifrão simples, por exemplo: $x^2 + 2x + 1 = 0$. Para frações, utilize \\frac{numerador}{denominador} dentro do modo matemático, por exemplo $\\frac{1}{4} + \\frac{2}{3}$.
+- Escreva expressões matemáticas usando sintaxe LaTeX delimitada por cifrão simples, por exemplo: $x^2 + 2x + 1 = 0$. Para frações, utilize SEMPRE o comando \\frac{numerador}{denominador} dentro do modo matemático (nunca escreva a fração como texto solto tipo "1/4"), por exemplo $\\frac{1}{4} + \\frac{2}{3}$.
+- Atenção ao formato de saída: como a resposta é um JSON, toda barra invertida de um comando LaTeX (\\frac, \\times, \\div, \\cdot, \\sqrt, \\pi, \\theta, \\leq, \\geq, \\neq, etc.) deve ser escrita como barra invertida DUPLA no JSON (ex.: \\\\frac{1}{4}), para que, depois de decodificado o JSON, sobre exatamente uma barra invertida (\\frac{1}{4}). Se escrever com uma única barra, o comando é corrompido e a fração aparece quebrada na prova — revise esse ponto antes de responder.
 - Números decimais (parte inteira e decimal separadas por vírgula) devem ser escritos normalmente, sem chaves e sem cifrão ao redor, por exemplo: 5,0 m ou 8,65. NUNCA escreva a vírgula decimal entre chaves (nunca escreva 5{,}0).
 - Você DEVE responder chamando a ferramenta "editar_questao" com os dados estruturados. Não escreva nenhum texto fora da chamada da ferramenta.`;
 

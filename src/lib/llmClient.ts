@@ -255,13 +255,41 @@ function stripBracedComma(text: string): string {
   return text.replace(/\{,\}/g, ",");
 }
 
+// Alguns modelos ocasionalmente esquecem de escapar a barra invertida de comandos LaTeX (ex.:
+// "\frac") ao gerar o JSON da chamada de ferramenta. Como "\f", "\t", "\n", "\b" e "\r" são
+// sequências de escape válidas em JSON, o parser as interpreta como caracteres de controle
+// (form feed, tab, etc.) em vez de "barra invertida + letra", e o comando chega já corrompido
+// (ex.: "\frac{1}{4}" vira "<form feed>rac{1}{4}"). Como esses caracteres de controle nunca são
+// usados de propósito no texto de uma prova, e comandos LaTeX só existem dentro do modo
+// matemático ($...$), reconstruímos a barra invertida perdida apenas dentro desses trechos.
+const CONTROL_CHAR_TO_ESCAPE_LETTER: Record<string, string> = {
+  "\b": "b",
+  "\t": "t",
+  "\n": "n",
+  "\f": "f",
+  "\r": "r",
+};
+
+function repairLatexControlChars(text: string): string {
+  return text.replace(/\$[^$]*\$/g, (mathSegment) =>
+    mathSegment.replace(
+      /[\b\t\n\f\r]/g,
+      (controlChar) => `\\${CONTROL_CHAR_TO_ESCAPE_LETTER[controlChar]}`,
+    ),
+  );
+}
+
+function sanitizeText(text: string): string {
+  return stripBracedComma(repairLatexControlChars(text));
+}
+
 const MULTIPLE_CHOICE_LETTERS = ["a", "b", "c", "d"] as const;
 
 function normalizeAlternativas(questao: Questao): Alternativa[] {
   const alternativas = questao.alternativas.map((alt, index) => ({
     ...alt,
     letra: (alt.letra || MULTIPLE_CHOICE_LETTERS[index]).toLowerCase(),
-    texto: stripBracedComma(alt.texto),
+    texto: sanitizeText(alt.texto),
   }));
 
   const seen = new Set<string>();
@@ -293,11 +321,11 @@ function normalizeQuestao(questao: Questao): Questao {
 
   return {
     ...questao,
-    enunciado: stripBracedComma(questao.enunciado),
-    imagem: questao.imagem ? stripBracedComma(questao.imagem) : undefined,
+    enunciado: sanitizeText(questao.enunciado),
+    imagem: questao.imagem ? sanitizeText(questao.imagem) : undefined,
     alternativas,
     respostaCorreta: respostaValida,
-    resolucao: stripBracedComma(questao.resolucao),
+    resolucao: sanitizeText(questao.resolucao),
   };
 }
 
@@ -333,7 +361,7 @@ export async function generateExam(
 
 function sanitizeExamData(data: ExamData): ExamData {
   return {
-    assunto: stripBracedComma(data.assunto),
+    assunto: sanitizeText(data.assunto),
     questoes: data.questoes.map((questao) => normalizeQuestao(questao)),
   };
 }
@@ -413,13 +441,13 @@ function sanitizeQuestionResult(
 ): QuestionEditResult {
   return {
     tipo: result.tipo,
-    enunciado: stripBracedComma(result.enunciado),
-    imagem: result.imagem ? stripBracedComma(result.imagem) : undefined,
+    enunciado: sanitizeText(result.enunciado),
+    imagem: result.imagem ? sanitizeText(result.imagem) : undefined,
     alternativas: result.alternativas.map((alt) => ({
       ...alt,
-      texto: stripBracedComma(alt.texto),
+      texto: sanitizeText(alt.texto),
     })),
     respostaCorreta: result.respostaCorreta,
-    resolucao: stripBracedComma(result.resolucao),
+    resolucao: sanitizeText(result.resolucao),
   };
 }
