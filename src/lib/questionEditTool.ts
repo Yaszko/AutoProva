@@ -19,46 +19,59 @@ Regras obrigatórias:
 - Você DEVE responder chamando a ferramenta "editar_questao" com os dados estruturados. Não escreva nenhum texto fora da chamada da ferramenta.`;
 
 export const QUESTION_EDIT_TOOL = {
-  name: 'editar_questao',
-  description: 'Estrutura os dados de uma única questão (nova ou editada) de uma avaliação acadêmica.',
+  name: "editar_questao",
+  description:
+    "Estrutura os dados de uma única questão (nova ou editada) de uma avaliação acadêmica.",
   input_schema: {
-    type: 'object',
+    type: "object",
     properties: {
       tipo: {
-        type: 'string',
-        enum: ['multipla_escolha', 'dissertativa'],
-        description: 'Tipo da questão.',
+        type: "string",
+        enum: ["multipla_escolha", "dissertativa"],
+        description: "Tipo da questão.",
       },
-      enunciado: { type: 'string', description: 'Enunciado completo da questão.' },
+      enunciado: {
+        type: "string",
+        description: "Enunciado completo da questão.",
+      },
       imagem: {
-        type: 'string',
+        type: "string",
         description:
-          'Imagem opcional exibida abaixo do enunciado e acima das alternativas. Pode ser uma URL, data URI ou um SVG inline completo.',
+          "Imagem opcional exibida abaixo do enunciado e acima das alternativas. Pode ser uma URL, data URI ou um SVG inline completo.",
       },
       alternativas: {
-        type: 'array',
+        type: "array",
         description:
-          'Alternativas da questão: array vazio para dissertativas, exatamente 4 (letras a a d) para múltipla escolha.',
+          "Alternativas da questão: array vazio para dissertativas, exatamente 4 (letras a a d) para múltipla escolha.",
         items: {
-          type: 'object',
+          type: "object",
           properties: {
-            letra: { type: 'string', description: 'Letra da alternativa (a, b, c ou d).' },
-            texto: { type: 'string', description: 'Texto da alternativa.' },
+            letra: {
+              type: "string",
+              description: "Letra da alternativa (a, b, c ou d).",
+            },
+            texto: { type: "string", description: "Texto da alternativa." },
           },
-          required: ['letra', 'texto'],
+          required: ["letra", "texto"],
         },
       },
       respostaCorreta: {
-        type: 'string',
+        type: "string",
         description:
           'Letra (a, b, c ou d) da alternativa correta. Obrigatório para questões de múltipla escolha; string vazia "" para dissertativas.',
       },
       resolucao: {
-        type: 'string',
+        type: "string",
         description:
-          'Resolução breve, direta e simplificada da questão (poucas linhas), justificando a resposta correta. Obrigatório para toda questão, seja múltipla escolha ou dissertativa.',
+          "Resolução breve, direta e simplificada da questão (poucas linhas), justificando a resposta correta. Obrigatório para toda questão, seja múltipla escolha ou dissertativa.",
       },
     },
-    required: ['tipo', 'enunciado', 'alternativas', 'respostaCorreta', 'resolucao'],
+    required: [
+      "tipo",
+      "enunciado",
+      "alternativas",
+      "respostaCorreta",
+      "resolucao",
+    ],
   },
 } as const;

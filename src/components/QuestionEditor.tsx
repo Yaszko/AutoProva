@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Loader2, Plus, Sparkles, X } from 'lucide-react';
-import { AnthropicApiError, editQuestion } from '../lib/anthropicClient';
-import { ExamData, Questao, TipoQuestao } from '../types';
+import { useState } from "react";
+import { Loader2, Plus, Sparkles, X } from "lucide-react";
+import { AnthropicApiError, editQuestion } from "../lib/anthropicClient";
+import { ExamData, Questao, TipoQuestao } from "../types";
 
 interface QuestionEditorProps {
   exam: ExamData | null;
@@ -10,20 +10,26 @@ interface QuestionEditorProps {
   model: string;
 }
 
-const ALTERNATIVA_LETRAS = ['a', 'b', 'c', 'd'];
+const ALTERNATIVA_LETRAS = ["a", "b", "c", "d"];
 
 function normalizeImageSource(source: string): string {
   const trimmed = source.trim();
-  if (trimmed.startsWith('<svg')) {
+  if (trimmed.startsWith("<svg")) {
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(trimmed)}`;
   }
   return source;
 }
 
-function updateQuestao(exam: ExamData, numero: number, updater: (questao: Questao) => Questao): ExamData {
+function updateQuestao(
+  exam: ExamData,
+  numero: number,
+  updater: (questao: Questao) => Questao,
+): ExamData {
   return {
     ...exam,
-    questoes: exam.questoes.map((questao) => (questao.numero === numero ? updater(questao) : questao)),
+    questoes: exam.questoes.map((questao) =>
+      questao.numero === numero ? updater(questao) : questao,
+    ),
   };
 }
 
@@ -32,16 +38,32 @@ function renumerar(questoes: Questao[]): Questao[] {
   return questoes.map((questao, index) => ({ ...questao, numero: index + 1 }));
 }
 
-function addQuestao(exam: ExamData, questao: Omit<Questao, 'numero'>): ExamData {
-  return { ...exam, questoes: [...exam.questoes, { ...questao, numero: exam.questoes.length + 1 }] };
+function addQuestao(
+  exam: ExamData,
+  questao: Omit<Questao, "numero">,
+): ExamData {
+  return {
+    ...exam,
+    questoes: [
+      ...exam.questoes,
+      { ...questao, numero: exam.questoes.length + 1 },
+    ],
+  };
 }
 
 function removeQuestao(exam: ExamData, numero: number): ExamData {
-  return { ...exam, questoes: renumerar(exam.questoes.filter((questao) => questao.numero !== numero)) };
+  return {
+    ...exam,
+    questoes: renumerar(
+      exam.questoes.filter((questao) => questao.numero !== numero),
+    ),
+  };
 }
 
 function errorMessage(err: unknown): string {
-  return err instanceof AnthropicApiError ? err.message : 'Ocorreu um erro inesperado ao consultar a IA.';
+  return err instanceof AnthropicApiError
+    ? err.message
+    : "Ocorreu um erro inesperado ao consultar a IA.";
 }
 
 interface AiPanelProps {
@@ -52,7 +74,7 @@ interface AiPanelProps {
 }
 
 function AiPanel({ placeholder, submitLabel, onSubmit, onDone }: AiPanelProps) {
-  const [instruction, setInstruction] = useState('');
+  const [instruction, setInstruction] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,7 +117,11 @@ function AiPanel({ placeholder, submitLabel, onSubmit, onDone }: AiPanelProps) {
           disabled={loading || !instruction.trim()}
           className="flex items-center gap-1 rounded-md bg-violet-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+          {loading ? (
+            <Loader2 size={12} className="animate-spin" />
+          ) : (
+            <Sparkles size={12} />
+          )}
           {submitLabel}
         </button>
       </div>
@@ -129,7 +155,9 @@ function QuestionCard({
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold text-zinc-400">Questão {questao.numero}</span>
+        <span className="text-xs font-semibold text-zinc-400">
+          Questão {questao.numero}
+        </span>
         <div className="flex items-center gap-1.5">
           <select
             value={questao.tipo}
@@ -143,7 +171,7 @@ function QuestionCard({
             type="button"
             onClick={() => setAiOpen((open) => !open)}
             aria-label={`Editar questão ${questao.numero} com IA`}
-            className={`rounded-md p-1 hover:bg-zinc-800 hover:text-violet-400 ${aiOpen ? 'bg-zinc-800 text-violet-400' : 'text-zinc-500'}`}
+            className={`rounded-md p-1 hover:bg-zinc-800 hover:text-violet-400 ${aiOpen ? "bg-zinc-800 text-violet-400" : "text-zinc-500"}`}
           >
             <Sparkles size={14} />
           </button>
@@ -169,7 +197,7 @@ function QuestionCard({
       <div className="mt-2 space-y-1.5">
         <input
           type="text"
-          value={questao.imagem ?? ''}
+          value={questao.imagem ?? ""}
           onChange={(e) => onImagemChange(e.target.value)}
           placeholder="URL da imagem (opcional)"
           className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
@@ -183,11 +211,13 @@ function QuestionCard({
         )}
       </div>
 
-      {questao.tipo === 'multipla_escolha' && (
+      {questao.tipo === "multipla_escolha" && (
         <div className="mt-2 space-y-1.5">
           {questao.alternativas.map((alt) => (
             <div key={alt.letra} className="flex items-center gap-1.5">
-              <span className="w-4 shrink-0 text-xs font-medium text-zinc-500">{alt.letra.toUpperCase()})</span>
+              <span className="w-4 shrink-0 text-xs font-medium text-zinc-500">
+                {alt.letra.toUpperCase()})
+              </span>
               <input
                 type="text"
                 value={alt.texto}
@@ -211,7 +241,12 @@ function QuestionCard({
   );
 }
 
-export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditorProps) {
+export function QuestionEditor({
+  exam,
+  onChange,
+  apiKey,
+  model,
+}: QuestionEditorProps) {
   const [aiAddOpen, setAiAddOpen] = useState(false);
 
   if (!exam) {
@@ -230,29 +265,45 @@ export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditor
         ...questao,
         tipo,
         alternativas:
-          tipo === 'dissertativa'
+          tipo === "dissertativa"
             ? []
             : questao.alternativas.length > 0
               ? questao.alternativas
-              : ALTERNATIVA_LETRAS.map((letra) => ({ letra, texto: '' })),
-        respostaCorreta: tipo === 'dissertativa' ? '' : questao.respostaCorreta,
+              : ALTERNATIVA_LETRAS.map((letra) => ({ letra, texto: "" })),
+        respostaCorreta: tipo === "dissertativa" ? "" : questao.respostaCorreta,
       })),
     );
   }
 
   function handleEnunciadoChange(numero: number, enunciado: string) {
-    onChange(updateQuestao(currentExam, numero, (questao) => ({ ...questao, enunciado })));
-  }
-
-  function handleImagemChange(numero: number, imagem: string) {
-    onChange(updateQuestao(currentExam, numero, (questao) => ({ ...questao, imagem: imagem || undefined })));
-  }
-
-  function handleAlternativaChange(numero: number, letra: string, texto: string) {
     onChange(
       updateQuestao(currentExam, numero, (questao) => ({
         ...questao,
-        alternativas: questao.alternativas.map((alt) => (alt.letra === letra ? { ...alt, texto } : alt)),
+        enunciado,
+      })),
+    );
+  }
+
+  function handleImagemChange(numero: number, imagem: string) {
+    onChange(
+      updateQuestao(currentExam, numero, (questao) => ({
+        ...questao,
+        imagem: imagem || undefined,
+      })),
+    );
+  }
+
+  function handleAlternativaChange(
+    numero: number,
+    letra: string,
+    texto: string,
+  ) {
+    onChange(
+      updateQuestao(currentExam, numero, (questao) => ({
+        ...questao,
+        alternativas: questao.alternativas.map((alt) =>
+          alt.letra === letra ? { ...alt, texto } : alt,
+        ),
       })),
     );
   }
@@ -264,33 +315,44 @@ export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditor
   function handleAddQuestaoBranco() {
     onChange(
       addQuestao(currentExam, {
-        tipo: 'multipla_escolha',
-        enunciado: '',
-        alternativas: ALTERNATIVA_LETRAS.map((letra) => ({ letra, texto: '' })),
-        respostaCorreta: '',
-        resolucao: '',
+        tipo: "multipla_escolha",
+        enunciado: "",
+        alternativas: ALTERNATIVA_LETRAS.map((letra) => ({ letra, texto: "" })),
+        respostaCorreta: "",
+        resolucao: "",
       }),
     );
   }
 
   async function handleAiEditQuestao(numero: number, instruction: string) {
-    const questaoAtual = currentExam.questoes.find((questao) => questao.numero === numero);
+    const questaoAtual = currentExam.questoes.find(
+      (questao) => questao.numero === numero,
+    );
     const result = await editQuestion(apiKey, model, instruction, {
       assunto: currentExam.assunto,
       questaoAtual,
     });
-    onChange(updateQuestao(currentExam, numero, (questao) => ({ ...questao, ...result })));
+    onChange(
+      updateQuestao(currentExam, numero, (questao) => ({
+        ...questao,
+        ...result,
+      })),
+    );
   }
 
   async function handleAiAddQuestao(instruction: string) {
-    const result = await editQuestion(apiKey, model, instruction, { assunto: currentExam.assunto });
+    const result = await editQuestion(apiKey, model, instruction, {
+      assunto: currentExam.assunto,
+    });
     onChange(addQuestao(currentExam, result));
   }
 
   return (
     <section className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 2xl:sticky 2xl:top-8 2xl:max-h-[calc(100vh-4rem)]">
       <div className="mb-2 shrink-0 space-y-2">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-300">Editar Questões</h2>
+        <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-300">
+          Editar Questões
+        </h2>
         <div className="flex items-center gap-1.5">
           <button
             type="button"
@@ -304,7 +366,9 @@ export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditor
             type="button"
             onClick={() => setAiAddOpen((open) => !open)}
             className={`flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1 text-xs hover:bg-zinc-800 ${
-              aiAddOpen ? 'border-violet-700 bg-zinc-800 text-violet-400' : 'border-zinc-700 text-zinc-300'
+              aiAddOpen
+                ? "border-violet-700 bg-zinc-800 text-violet-400"
+                : "border-zinc-700 text-zinc-300"
             }`}
           >
             <Sparkles size={14} />
@@ -331,11 +395,19 @@ export function QuestionEditor({ exam, onChange, apiKey, model }: QuestionEditor
             questao={questao}
             canRemove={exam.questoes.length > 1}
             onTipoChange={(tipo) => handleTipoChange(questao.numero, tipo)}
-            onEnunciadoChange={(value) => handleEnunciadoChange(questao.numero, value)}
-            onImagemChange={(value) => handleImagemChange(questao.numero, value)}
-            onAlternativaChange={(letra, value) => handleAlternativaChange(questao.numero, letra, value)}
+            onEnunciadoChange={(value) =>
+              handleEnunciadoChange(questao.numero, value)
+            }
+            onImagemChange={(value) =>
+              handleImagemChange(questao.numero, value)
+            }
+            onAlternativaChange={(letra, value) =>
+              handleAlternativaChange(questao.numero, letra, value)
+            }
             onRemove={() => handleRemoveQuestao(questao.numero)}
-            onAiEdit={(instruction) => handleAiEditQuestao(questao.numero, instruction)}
+            onAiEdit={(instruction) =>
+              handleAiEditQuestao(questao.numero, instruction)
+            }
           />
         ))}
       </div>

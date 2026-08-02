@@ -23,65 +23,84 @@ Regras obrigatórias:
 
 export function buildExamTool(numQuestoes: number) {
   return {
-    name: 'gerar_prova',
+    name: "gerar_prova",
     description: `Estrutura os dados completos de uma avaliação acadêmica de ${numQuestoes} questões, prontos para serem exibidos na prévia HTML e exportados em PDF.`,
     input_schema: {
-      type: 'object',
+      type: "object",
       properties: {
         assunto: {
-          type: 'string',
+          type: "string",
           description:
             'Título curto (2 a 5 palavras) resumindo o assunto/tema central da prova, em português. Usado no nome do arquivo exportado, então não deve conter aspas nem os caracteres \\ / : * ? < > |. Ex: "Teorema de Pitágoras".',
         },
         questoes: {
-          type: 'array',
+          type: "array",
           description: `Lista com exatamente ${numQuestoes} questões da avaliação.`,
           minItems: numQuestoes,
           maxItems: numQuestoes,
           items: {
-            type: 'object',
+            type: "object",
             properties: {
-              numero: { type: 'integer', description: `Número da questão, de 1 a ${numQuestoes}.` },
-              tipo: {
-                type: 'string',
-                enum: ['multipla_escolha', 'dissertativa'],
-                description: 'Tipo da questão.',
+              numero: {
+                type: "integer",
+                description: `Número da questão, de 1 a ${numQuestoes}.`,
               },
-              enunciado: { type: 'string', description: 'Enunciado completo da questão.' },
+              tipo: {
+                type: "string",
+                enum: ["multipla_escolha", "dissertativa"],
+                description: "Tipo da questão.",
+              },
+              enunciado: {
+                type: "string",
+                description: "Enunciado completo da questão.",
+              },
               imagem: {
-                type: 'string',
+                type: "string",
                 description:
-                  'Imagem opcional exibida abaixo do enunciado e acima das alternativas. Pode ser uma URL, data URI ou um SVG inline completo.',
+                  "Imagem opcional exibida abaixo do enunciado e acima das alternativas. Pode ser uma URL, data URI ou um SVG inline completo.",
               },
               alternativas: {
-                type: 'array',
+                type: "array",
                 description:
-                  'Alternativas da questão: array vazio para dissertativas, exatamente 4 (letras a a d) para múltipla escolha.',
+                  "Alternativas da questão: array vazio para dissertativas, exatamente 4 (letras a a d) para múltipla escolha.",
                 items: {
-                  type: 'object',
+                  type: "object",
                   properties: {
-                    letra: { type: 'string', description: 'Letra da alternativa (a, b, c ou d).' },
-                    texto: { type: 'string', description: 'Texto da alternativa.' },
+                    letra: {
+                      type: "string",
+                      description: "Letra da alternativa (a, b, c ou d).",
+                    },
+                    texto: {
+                      type: "string",
+                      description: "Texto da alternativa.",
+                    },
                   },
-                  required: ['letra', 'texto'],
+                  required: ["letra", "texto"],
                 },
               },
               respostaCorreta: {
-                type: 'string',
+                type: "string",
                 description:
                   'Letra (a, b, c ou d) da alternativa correta. Obrigatório para questões de múltipla escolha; string vazia "" para dissertativas.',
               },
               resolucao: {
-                type: 'string',
+                type: "string",
                 description:
-                  'Resolução breve, direta e simplificada da questão (poucas linhas), justificando a resposta correta. Obrigatório para toda questão, seja múltipla escolha ou dissertativa.',
+                  "Resolução breve, direta e simplificada da questão (poucas linhas), justificando a resposta correta. Obrigatório para toda questão, seja múltipla escolha ou dissertativa.",
               },
             },
-            required: ['numero', 'tipo', 'enunciado', 'alternativas', 'respostaCorreta', 'resolucao'],
+            required: [
+              "numero",
+              "tipo",
+              "enunciado",
+              "alternativas",
+              "respostaCorreta",
+              "resolucao",
+            ],
           },
         },
       },
-      required: ['assunto', 'questoes'],
+      required: ["assunto", "questoes"],
     },
   } as const;
 }

@@ -3,7 +3,7 @@ export interface Alternativa {
   texto: string;
 }
 
-export type TipoQuestao = 'multipla_escolha' | 'dissertativa';
+export type TipoQuestao = "multipla_escolha" | "dissertativa";
 
 export interface Questao {
   numero: number;
@@ -23,7 +23,7 @@ export interface ExamData {
   questoes: Questao[];
 }
 
-export type TipoAvaliacao = 'avaliacao' | 'recuperacao';
+export type TipoAvaliacao = "avaliacao" | "recuperacao";
 
 export interface HeaderInfo {
   professor: string;
