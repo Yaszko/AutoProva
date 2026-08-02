@@ -137,6 +137,7 @@ interface QuestionCardProps {
   onEnunciadoChange: (value: string) => void;
   onImagemChange: (value: string) => void;
   onAlternativaChange: (letra: string, value: string) => void;
+  onRespostaCorretaChange: (letra: string) => void;
   onRemove: () => void;
   onAiEdit: (instruction: string) => Promise<void>;
 }
@@ -148,6 +149,7 @@ function QuestionCard({
   onEnunciadoChange,
   onImagemChange,
   onAlternativaChange,
+  onRespostaCorretaChange,
   onRemove,
   onAiEdit,
 }: QuestionCardProps) {
@@ -214,19 +216,33 @@ function QuestionCard({
 
       {questao.tipo === "multipla_escolha" && (
         <div className="mt-2 space-y-1.5">
-          {questao.alternativas.map((alt) => (
-            <div key={alt.letra} className="flex items-center gap-1.5">
-              <span className="w-4 shrink-0 text-xs font-medium text-zinc-500">
-                {alt.letra.toUpperCase()})
-              </span>
-              <input
-                type="text"
-                value={alt.texto}
-                onChange={(e) => onAlternativaChange(alt.letra, e.target.value)}
-                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-100 focus:border-zinc-600 focus:outline-none"
-              />
-            </div>
-          ))}
+          {questao.alternativas.map((alt) => {
+            const isCorreta = alt.letra === questao.respostaCorreta;
+            return (
+              <div key={alt.letra} className="flex items-center gap-1.5">
+                <input
+                  type="radio"
+                  name={`resposta-correta-${questao.numero}`}
+                  checked={isCorreta}
+                  onChange={() => onRespostaCorretaChange(alt.letra)}
+                  aria-label={`Marcar alternativa ${alt.letra.toUpperCase()} como correta`}
+                  title="Marcar como resposta correta"
+                  className="shrink-0 accent-violet-600"
+                />
+                <span
+                  className={`w-4 shrink-0 text-xs font-medium ${isCorreta ? "text-violet-400" : "text-zinc-500"}`}
+                >
+                  {alt.letra.toUpperCase()})
+                </span>
+                <input
+                  type="text"
+                  value={alt.texto}
+                  onChange={(e) => onAlternativaChange(alt.letra, e.target.value)}
+                  className={`w-full rounded-md border bg-zinc-950 px-2 py-1 text-xs text-zinc-100 focus:border-zinc-600 focus:outline-none ${isCorreta ? "border-violet-700/70" : "border-zinc-800"}`}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -306,6 +322,15 @@ export function QuestionEditor({
         alternativas: questao.alternativas.map((alt) =>
           alt.letra === letra ? { ...alt, texto } : alt,
         ),
+      })),
+    );
+  }
+
+  function handleRespostaCorretaChange(numero: number, letra: string) {
+    onChange(
+      updateQuestao(currentExam, numero, (questao) => ({
+        ...questao,
+        respostaCorreta: letra,
       })),
     );
   }
@@ -405,6 +430,9 @@ export function QuestionEditor({
             }
             onAlternativaChange={(letra, value) =>
               handleAlternativaChange(questao.numero, letra, value)
+            }
+            onRespostaCorretaChange={(letra) =>
+              handleRespostaCorretaChange(questao.numero, letra)
             }
             onRemove={() => handleRemoveQuestao(questao.numero)}
             onAiEdit={(instruction) =>
