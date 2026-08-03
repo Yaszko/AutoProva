@@ -66,7 +66,7 @@ export function PromptArea({
         ) : (
           <>
             <Sparkles size={16} />
-            Gerar Prova ({numQuestoes} {numQuestoes === 1 ? 'Questão' : 'Questões'})
+            Gerar Prova
           </>
         )}
       </button>
