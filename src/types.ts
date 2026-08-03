@@ -34,5 +34,6 @@ export interface HeaderInfo {
   professor: string;
   turma: string;
   tipo: TipoAvaliacao;
+  disciplina: string;
   valor: string;
 }

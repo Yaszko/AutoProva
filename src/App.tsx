@@ -17,6 +17,7 @@ const DEFAULT_HEADER: HeaderInfo = {
   professor: '',
   turma: '',
   tipo: 'avaliacao',
+  disciplina: '',
   valor: '',
 };
 
@@ -37,9 +38,10 @@ const DEFAULT_API_KEYS: Record<LlmProvider, string> = {
   google: '',
 };
 
-const HEADER_FIELD_LABELS: [key: keyof Pick<HeaderInfo, 'professor' | 'turma' | 'valor'>, label: string][] = [
+const HEADER_FIELD_LABELS: [key: keyof Pick<HeaderInfo, 'professor' | 'turma' | 'disciplina' | 'valor'>, label: string][] = [
   ['professor', 'professor(a)'],
   ['turma', 'turma'],
+  ['disciplina', 'disciplina'],
   ['valor', 'valor'],
 ];
 
@@ -61,7 +63,7 @@ export default function App() {
     DEFAULT_API_KEYS,
   );
   const [model, setModel] = useLocalStorage('autoprova_model', defaultModelFor(provider));
-  const [header, setHeader] = useLocalStorage<HeaderInfo>('autoprova_header_v4', DEFAULT_HEADER);
+  const [header, setHeader] = useLocalStorage<HeaderInfo>('autoprova_header_v5', DEFAULT_HEADER);
   const [customSchools, setCustomSchools] = useLocalStorage<Record<SchoolId, SchoolInfo>>(
     'autoprova_custom_schools',
     {},
