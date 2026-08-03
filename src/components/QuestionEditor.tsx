@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Loader2, Plus, Sparkles, X } from "lucide-react";
+import { Loader2, Plus, Shapes, Sparkles, X } from "lucide-react";
 import { LlmApiError, editQuestion } from "../lib/llmClient";
 import { ExamData, LlmProvider, Questao, TipoQuestao } from "../types";
+import { ImageEditorModal } from "./ImageEditorModal";
 
 interface QuestionEditorProps {
   exam: ExamData | null;
@@ -154,6 +155,7 @@ function QuestionCard({
   onAiEdit,
 }: QuestionCardProps) {
   const [aiOpen, setAiOpen] = useState(false);
+  const [imageEditorOpen, setImageEditorOpen] = useState(false);
 
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
@@ -198,13 +200,24 @@ function QuestionCard({
       />
 
       <div className="mt-2 space-y-1.5">
-        <input
-          type="text"
-          value={questao.imagem ?? ""}
-          onChange={(e) => onImagemChange(e.target.value)}
-          placeholder="URL da imagem (opcional)"
-          className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
-        />
+        <div className="flex items-center gap-1.5">
+          <input
+            type="text"
+            value={questao.imagem ?? ""}
+            onChange={(e) => onImagemChange(e.target.value)}
+            placeholder="URL da imagem (opcional)"
+            className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => setImageEditorOpen(true)}
+            aria-label={`Editor visual de imagem da questão ${questao.numero}`}
+            title="Editor visual de imagem"
+            className="shrink-0 rounded-md border border-zinc-800 p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-violet-400"
+          >
+            <Shapes size={14} />
+          </button>
+        </div>
         {questao.imagem && (
           <img
             src={normalizeImageSource(questao.imagem)}
@@ -213,6 +226,18 @@ function QuestionCard({
           />
         )}
       </div>
+
+      {imageEditorOpen && (
+        <ImageEditorModal
+          questionNumero={questao.numero}
+          initialImage={questao.imagem}
+          onSave={(svg) => {
+            onImagemChange(svg);
+            setImageEditorOpen(false);
+          }}
+          onClose={() => setImageEditorOpen(false)}
+        />
+      )}
 
       {questao.tipo === "multipla_escolha" && (
         <div className="mt-2 space-y-1.5">
