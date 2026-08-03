@@ -1,10 +1,19 @@
 import { forwardRef, useState } from "react";
 import { ExamData, HeaderInfo, Questao } from "../types";
 import { buildExamTitle } from "../lib/examTitle";
+import {
+  ExamPaperMode,
+  LABELS,
+  hasMultiplaEscolha,
+  formatQuestionNumber,
+  isCorrectAlternative,
+  normalizeImageSource,
+  shouldShowResolucao,
+} from "../lib/examContent";
 import { resolveLogoSrc, SchoolId, SchoolInfo } from "../lib/schoolInfo";
 import { MathText } from "./MathText";
 
-export type ExamPaperMode = "prova" | "gabarito";
+export type { ExamPaperMode };
 
 interface ExamPaperProps {
   exam: ExamData;
@@ -58,14 +67,6 @@ function LetraBolha({
   return <span>{CIRCLED_LETTERS[letra] ?? letra}</span>;
 }
 
-function normalizeImageSource(source: string): string {
-  const trimmed = source.trim();
-  if (trimmed.startsWith("<svg")) {
-    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(trimmed)}`;
-  }
-  return source;
-}
-
 function GabaritoBox({
   questoes,
   mode,
@@ -81,7 +82,7 @@ function GabaritoBox({
             colSpan={2}
             className="border border-zinc-400 bg-zinc-200 px-2 py-1 font-bold"
           >
-            GABARITO
+            {LABELS.gabarito}
           </th>
         </tr>
       </thead>
@@ -89,7 +90,7 @@ function GabaritoBox({
         {questoes.map((questao) => (
           <tr key={questao.numero}>
             <td className="border border-zinc-400 px-2 py-1 text-center">
-              {String(questao.numero).padStart(2, "0")}
+              {formatQuestionNumber(questao.numero)}
             </td>
             <td className="border border-zinc-400 px-2 py-1 text-center text-sm tracking-widest">
               {questao.tipo === "multipla_escolha" ? (
@@ -102,14 +103,14 @@ function GabaritoBox({
                         letra={letra}
                         preenchida={
                           mode === "gabarito" &&
-                          letra === questao.respostaCorreta.toUpperCase()
+                          isCorrectAlternative(questao, letra)
                         }
                       />
                     );
                   })}
                 </span>
               ) : (
-                <span className="italic">dissertativa</span>
+                <span className="italic">{LABELS.dissertativa}</span>
               )}
             </td>
           </tr>
@@ -123,7 +124,7 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(
   function ExamPaper({ exam, header, schools, mode = "prova" }, ref) {
     const escola = schools[header.escola] ?? Object.values(schools)[0];
     return (
-      <div ref={ref} className="bg-zinc-50 p-8 text-zinc-900">
+      <div ref={ref} className="bg-white p-8 text-zinc-900">
         <div className="relative mb-3 min-h-16">
           {escola.logoEsquerda && (
             <div className="absolute left-0 top-0">
@@ -145,20 +146,20 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(
             <p className="text-sm font-bold">{escola.instituicao}</p>
             <p>{escola.endereco}</p>
             <p>
-              Telefone: {escola.telefone} &nbsp;&nbsp; e-mail – {escola.email}
+              {LABELS.telefonePrefix} {escola.telefone} &nbsp;&nbsp; {LABELS.emailPrefix} {escola.email}
             </p>
           </div>
         </div>
 
         <div className="mb-2 flex justify-between text-xs">
           <span>
-            <span className="font-semibold">Aluno(a):</span>{" "}
+            <span className="font-semibold">{LABELS.alunoPrefix}</span>{" "}
             <span className="inline-block w-72 border-b border-zinc-400">
               &nbsp;
             </span>
           </span>
           <span>
-            <span className="font-semibold">nº</span>{" "}
+            <span className="font-semibold">{LABELS.numeroPrefix}</span>{" "}
             <span className="inline-block w-16 border-b border-zinc-400">
               &nbsp;
             </span>
@@ -167,17 +168,17 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(
 
         <div className="mb-4 flex flex-wrap justify-between gap-2 text-xs">
           <span>
-            <span className="font-semibold">Professor:</span>{" "}
+            <span className="font-semibold">{LABELS.professorPrefix}</span>{" "}
             {header.professor || "—"}
           </span>
           <span>
-            <span className="font-semibold">Data:</span> ____/____/____
+            <span className="font-semibold">{LABELS.dataPrefix}</span> {LABELS.dataPlaceholder}
           </span>
           <span>
-            <span className="font-semibold">Turma:</span> {header.turma || "—"}
+            <span className="font-semibold">{LABELS.turmaPrefix}</span> {header.turma || "—"}
           </span>
           <span>
-            <span className="font-semibold">Nota:</span>{" "}
+            <span className="font-semibold">{LABELS.notaPrefix}</span>{" "}
             <span className="inline-block w-16 border-b border-zinc-400">
               &nbsp;
             </span>
@@ -187,12 +188,12 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(
         <p className="mb-3 text-sm font-bold">{buildExamTitle(header)}</p>
 
         <div>
-          {exam.questoes.some(
-            (questao) => questao.tipo === "multipla_escolha",
-          ) && <GabaritoBox questoes={exam.questoes} mode={mode} />}
+          {hasMultiplaEscolha(exam.questoes) && (
+            <GabaritoBox questoes={exam.questoes} mode={mode} />
+          )}
           <ol className="list-none space-y-6 text-xs">
             {exam.questoes.map((questao) => (
-              <li key={questao.numero} data-page-break-boundary="true">
+              <li key={questao.numero}>
                 <p className="mb-2">
                   <span className="font-semibold">{questao.numero}.</span>{" "}
                   <MathText text={questao.enunciado} />
@@ -224,9 +225,9 @@ export const ExamPaper = forwardRef<HTMLDivElement, ExamPaperProps>(
                     ))}
                   </div>
                 ) : null}
-                {mode === "gabarito" && (
+                {shouldShowResolucao(mode) && (
                   <p className="ml-1 mt-2 text-red-600">
-                    <span className="font-semibold">Resolução:</span>{" "}
+                    <span className="font-semibold">{LABELS.resolucaoPrefix}</span>{" "}
                     {questao.resolucao ? (
                       <MathText text={questao.resolucao} />
                     ) : null}

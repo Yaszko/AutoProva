@@ -1,17 +1,17 @@
 import katex from 'katex';
+import { isMathSegment, mathContent, splitTextSegments } from '../lib/mathSegments';
 
 interface MathTextProps {
   text: string;
 }
 
 function renderSegment(segment: string, key: number) {
-  const isMath = segment.startsWith('$') && segment.endsWith('$') && segment.length > 1;
-  if (!isMath) {
+  if (!isMathSegment(segment)) {
     return <span key={key}>{segment}</span>;
   }
 
   try {
-    const html = katex.renderToString(segment.slice(1, -1), { throwOnError: false });
+    const html = katex.renderToString(mathContent(segment), { throwOnError: false });
     // eslint-disable-next-line react/no-danger -- HTML é gerado pelo KaTeX a partir de sintaxe matemática, não é HTML arbitrário
     return <span key={key} dangerouslySetInnerHTML={{ __html: html }} />;
   } catch {
@@ -20,6 +20,6 @@ function renderSegment(segment: string, key: number) {
 }
 
 export function MathText({ text }: MathTextProps) {
-  const segments = text.split(/(\$[^$]*\$)/g);
+  const segments = splitTextSegments(text);
   return <>{segments.map(renderSegment)}</>;
 }
