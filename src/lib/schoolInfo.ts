@@ -17,11 +17,22 @@ export interface SchoolInfo {
   logoDireita?: string;
 }
 
-// Nenhuma escola vem pré-cadastrada: o usuário deve adicionar a(s) própria(s) escola(s) pelo
-// botão "+" (ver AddSchoolModal.tsx). "" representa "nenhuma escola selecionada".
-export const DEFAULT_SCHOOL: SchoolId = "";
+// Escola pré-cadastrada como padrão da aplicação; o usuário pode editá-la ou adicionar outras
+// pelo botão "+" (ver SchoolFormModal.tsx).
+export const DEFAULT_SCHOOL: SchoolId = "tarsila-do-amaral";
 
-export const SCHOOLS: Record<SchoolId, SchoolInfo> = {};
+export const SCHOOLS: Record<SchoolId, SchoolInfo> = {
+  [DEFAULT_SCHOOL]: {
+    nome: "Colégio Estadual Tarsila do Amaral",
+    instituicao: "Colégio Estadual Tarsila do Amaral - E.F.M",
+    endereco:
+      "Rua Francisco Muñoz Madrid, nº 1800, Roseira São José dos Pinhais – Paraná",
+    telefone: "3283-6042",
+    email: "sjptarsiladoamaral@escola.pr.gov.br",
+    logoEsquerda: "logo_escola.png",
+    logoDireita: "logo_apg.png",
+  },
+};
 
 // Logos de escolas pré-cadastradas são nomes de arquivo relativos a /public; logos de escolas
 // adicionadas pelo usuário já chegam prontos como data URI (data:image/...). Só o primeiro caso
