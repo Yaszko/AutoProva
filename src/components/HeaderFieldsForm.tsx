@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { HeaderInfo } from '../types';
 import { createSchoolId, SchoolId, SchoolInfo } from '../lib/schoolInfo';
 import { SchoolFormModal } from './SchoolFormModal';
@@ -8,14 +8,25 @@ interface HeaderFieldsFormProps {
   value: HeaderInfo;
   onChange: (value: HeaderInfo) => void;
   schools: Record<SchoolId, SchoolInfo>;
+  /** Ids de escolas cadastradas pelo usuário (não as pré-instaladas), as únicas que podem ser removidas. */
+  removableSchoolIds: Set<SchoolId>;
   onSaveSchool: (id: SchoolId, school: SchoolInfo) => void;
+  onRemoveSchool: (id: SchoolId) => void;
 }
 
 type SchoolModalMode = 'add' | 'edit' | null;
 
-export function HeaderFieldsForm({ value, onChange, schools, onSaveSchool }: HeaderFieldsFormProps) {
+export function HeaderFieldsForm({
+  value,
+  onChange,
+  schools,
+  removableSchoolIds,
+  onSaveSchool,
+  onRemoveSchool,
+}: HeaderFieldsFormProps) {
   const [schoolModalMode, setSchoolModalMode] = useState<SchoolModalMode>(null);
   const selectedSchool = schools[value.escola];
+  const canRemoveSelectedSchool = removableSchoolIds.has(value.escola);
 
   function handleSaveSchool(school: SchoolInfo) {
     if (schoolModalMode === 'edit' && value.escola) {
@@ -26,6 +37,14 @@ export function HeaderFieldsForm({ value, onChange, schools, onSaveSchool }: Hea
       onChange({ ...value, escola: id });
     }
     setSchoolModalMode(null);
+  }
+
+  function handleRemoveSchool() {
+    if (!canRemoveSelectedSchool) return;
+    if (!window.confirm(`Remover a escola "${selectedSchool.nome}"? Essa ação não pode ser desfeita.`)) {
+      return;
+    }
+    onRemoveSchool(value.escola);
   }
 
   return (
@@ -67,6 +86,16 @@ export function HeaderFieldsForm({ value, onChange, schools, onSaveSchool }: Hea
               className="shrink-0 rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
             >
               <Plus size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={handleRemoveSchool}
+              disabled={!canRemoveSelectedSchool}
+              aria-label="Remover escola selecionada"
+              title={canRemoveSelectedSchool ? 'Remover escola selecionada' : 'Escolas pré-cadastradas não podem ser removidas'}
+              className="shrink-0 rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-red-950 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-400"
+            >
+              <Trash2 size={16} />
             </button>
           </div>
         </div>

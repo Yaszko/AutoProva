@@ -4,9 +4,9 @@ import { ConfigPanel } from './components/ConfigPanel';
 import { HeaderFieldsForm } from './components/HeaderFieldsForm';
 import { PromptArea } from './components/PromptArea';
 import { ResultPanel } from './components/ResultPanel';
-import { QuestionEditor } from './components/QuestionEditor';
 import { ErrorAlert } from './components/ErrorAlert';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useExamEditor } from './hooks/useExamEditor';
 import { generateExam, LlmApiError } from './lib/llmClient';
 import { defaultModelFor, isValidModelFor } from './lib/llmProviders';
 import { ExamData, HeaderInfo, LlmProvider } from './types';
@@ -77,9 +77,18 @@ export default function App() {
   const apiKey = apiKeys[provider] ?? '';
   const effectiveModel = isValidModelFor(provider, model) ? model : defaultModelFor(provider);
   const schools = { ...SCHOOLS, ...customSchools };
+  const examEditor = useExamEditor(exam, setExam, provider, apiKey, effectiveModel);
 
   function handleSaveSchool(id: SchoolId, school: SchoolInfo) {
     setCustomSchools({ ...customSchools, [id]: school });
+  }
+
+  function handleRemoveSchool(id: SchoolId) {
+    const { [id]: _removed, ...rest } = customSchools;
+    setCustomSchools(rest);
+    if (header.escola === id) {
+      setHeader({ ...header, escola: DEFAULT_SCHOOL });
+    }
   }
 
   function handleProviderChange(nextProvider: LlmProvider) {
@@ -130,8 +139,9 @@ export default function App() {
       </header>
 
       {/* Abaixo de lg, a página flui e scrola normalmente (melhor para celular). A partir de lg, a
-          página fica travada e cada bloco (config, prévia, editor) scrola internamente. */}
-      <main className="mx-auto grid w-full max-w-[96rem] grid-cols-1 gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:min-h-0 lg:flex-1 lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_1fr] lg:overflow-hidden 2xl:grid-cols-[360px_1fr_320px] 2xl:grid-rows-1">
+          página fica travada e cada bloco (config, prévia) scrola internamente. A edição das
+          questões acontece direto na prévia (aba "Prévia da Prova"), não há mais painel à parte. */}
+      <main className="mx-auto grid w-full max-w-[96rem] grid-cols-1 gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:min-h-0 lg:flex-1 lg:grid-cols-[360px_1fr] lg:overflow-hidden">
         <div className="space-y-6 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
           <ConfigPanel
             provider={provider}
@@ -145,7 +155,9 @@ export default function App() {
             value={header}
             onChange={setHeader}
             schools={schools}
+            removableSchoolIds={new Set(Object.keys(customSchools))}
             onSaveSchool={handleSaveSchool}
+            onRemoveSchool={handleRemoveSchool}
           />
           <PromptArea
             prompt={prompt}
@@ -159,17 +171,7 @@ export default function App() {
         </div>
 
         <div className="min-w-0 lg:min-h-0 lg:overflow-hidden">
-          <ResultPanel exam={exam} header={header} schools={schools} />
-        </div>
-
-        <div className="col-span-full min-w-0 lg:min-h-0 lg:overflow-hidden 2xl:col-span-1">
-          <QuestionEditor
-            exam={exam}
-            onChange={setExam}
-            provider={provider}
-            apiKey={apiKey}
-            model={effectiveModel}
-          />
+          <ResultPanel exam={exam} header={header} schools={schools} editor={examEditor} />
         </div>
       </main>
     </div>

@@ -3,6 +3,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { ExamData, HeaderInfo } from '../types';
 import { buildDownloadFileName } from '../lib/fileName';
 import { generateExamPdf } from '../lib/pdf/examPdf';
+import { ExamEditorHandlers } from '../hooks/useExamEditor';
 import { SchoolId, SchoolInfo } from '../lib/schoolInfo';
 import { ExamPaper, ExamPaperMode } from './ExamPaper';
 
@@ -11,9 +12,11 @@ interface PreviewDocumentProps {
   header: HeaderInfo;
   schools: Record<SchoolId, SchoolInfo>;
   mode?: ExamPaperMode;
+  editable?: boolean;
+  editor?: ExamEditorHandlers;
 }
 
-export function PreviewDocument({ exam, header, schools, mode = 'prova' }: PreviewDocumentProps) {
+export function PreviewDocument({ exam, header, schools, mode = 'prova', editable, editor }: PreviewDocumentProps) {
   const [generating, setGenerating] = useState(false);
 
   async function handleDownloadPdf() {
@@ -51,7 +54,7 @@ export function PreviewDocument({ exam, header, schools, mode = 'prova' }: Previ
           e sim scrolada horizontalmente, para não quebrar o layout impresso. */}
       <div className="overflow-x-auto lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         <div className="mx-auto w-full min-w-[42rem] max-w-2xl overflow-hidden rounded-sm shadow-xl">
-          <ExamPaper exam={exam} header={header} schools={schools} mode={mode} />
+          <ExamPaper exam={exam} header={header} schools={schools} mode={mode} editable={editable} editor={editor} />
         </div>
       </div>
     </div>

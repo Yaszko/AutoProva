@@ -15,10 +15,40 @@ import {
   shouldShowResolucao,
 } from "../examContent";
 import { SchoolId, SchoolInfo, resolveLogoSrc } from "../schoolInfo";
+import { isMathSegment, splitTextSegments } from "../mathSegments";
+import { parseFormattingRuns } from "../richTextRuns";
 import { RasterImage, rasterizeImageSource } from "./imageRaster";
 import { MathColor, RasterizedMath, collectMathEntries, rasterizeMathEntries } from "./mathRaster";
-import { StyledRun, drawLines, layoutParagraph, tokenizeRuns } from "./richText";
+import { RgbColor, StyledRun, drawLines, layoutParagraph, tokenizeRuns } from "./richText";
 import { ptToMm } from "./units";
+
+// Converte um campo de texto cru (enunciado/alternativa, podendo conter $...$ e marcadores
+// **negrito**/*itálico*/__sublinhado__) em StyledRun[] — mesma ordem de separação que
+// MathText.tsx usa na tela (primeiro $...$, só depois os marcadores de formatação dentro de cada
+// pedaço não-matemático), para a formatação nunca divergir entre prévia e PDF: um marcador não
+// pode atravessar uma fórmula em nenhum dos dois lados.
+function styledRunsFromRichText(text: string, color: RgbColor, mathColor: MathColor): StyledRun[] {
+  const runs: StyledRun[] = [];
+  for (const segment of splitTextSegments(text)) {
+    if (segment.length === 0) continue;
+    if (isMathSegment(segment)) {
+      runs.push({ text: segment, color, mathColor });
+      continue;
+    }
+    for (const run of parseFormattingRuns(segment)) {
+      runs.push({
+        text: run.text,
+        bold: run.bold,
+        italic: run.italic,
+        underline: run.underline,
+        fontScale: run.fontScale,
+        color,
+        mathColor,
+      });
+    }
+  }
+  return runs;
+}
 
 export interface GenerateExamPdfOptions {
   exam: ExamData;
@@ -284,13 +314,14 @@ function measureAndDrawQuestion(
 ): number {
   let y = startYMm;
 
+  const enunciadoAlign = questao.enunciadoStyle?.align ?? "left";
   const enunciadoRuns: StyledRun[] = [
     { text: `${questao.numero}.`, bold: true, color: TEXT_COLOR },
-    { text: ` ${questao.enunciado}`, color: TEXT_COLOR, mathColor: "black" as MathColor },
+    ...styledRunsFromRichText(` ${questao.enunciado}`, TEXT_COLOR, "black"),
   ];
   const enunciadoTokens = tokenizeRuns(doc, enunciadoRuns, mathCache, FONT_BODY_PT);
   const enunciadoLayout = layoutParagraph(doc, enunciadoTokens, y, getMaxWidthMm, FONT_BODY_PT);
-  if (draw) drawLines(doc, enunciadoLayout.lines, MARGIN_MM, y, FONT_BODY_PT);
+  if (draw) drawLines(doc, enunciadoLayout.lines, MARGIN_MM, y, FONT_BODY_PT, enunciadoAlign);
   y += enunciadoLayout.totalHeightMm;
 
   if (questionImage) {
@@ -313,7 +344,7 @@ function measureAndDrawQuestion(
     for (const alt of questao.alternativas) {
       const runs: StyledRun[] = [
         { text: `${alt.letra.toUpperCase()})`, color: TEXT_COLOR },
-        { text: ` ${alt.texto}`, color: TEXT_COLOR, mathColor: "black" },
+        ...styledRunsFromRichText(` ${alt.texto}`, TEXT_COLOR, "black"),
       ];
       const tokens = tokenizeRuns(doc, runs, mathCache, FONT_BODY_PT);
       const indentedMaxWidth = (yy: number) => getMaxWidthMm(yy) - ALT_INDENT_MM;
@@ -341,7 +372,7 @@ function measureAndDrawQuestion(
     y += GAP_MM;
     const runs: StyledRun[] = [{ text: LABELS.resolucaoPrefix, bold: true, color: RESOLUCAO_COLOR }];
     if (questao.resolucao) {
-      runs.push({ text: ` ${questao.resolucao}`, color: RESOLUCAO_COLOR, mathColor: "red" });
+      runs.push(...styledRunsFromRichText(` ${questao.resolucao}`, RESOLUCAO_COLOR, "red"));
     }
     const tokens = tokenizeRuns(doc, runs, mathCache, FONT_BODY_PT);
     const layout = layoutParagraph(doc, tokens, y, getMaxWidthMm, FONT_BODY_PT);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ExamData, HeaderInfo } from '../types';
+import { ExamEditorHandlers } from '../hooks/useExamEditor';
 import { SchoolId, SchoolInfo } from '../lib/schoolInfo';
 import { PreviewDocument } from './PreviewDocument';
 import { EmptyState } from './EmptyState';
@@ -8,11 +9,12 @@ interface ResultPanelProps {
   exam: ExamData | null;
   header: HeaderInfo;
   schools: Record<SchoolId, SchoolInfo>;
+  editor: ExamEditorHandlers;
 }
 
 type Tab = 'preview' | 'gabarito';
 
-export function ResultPanel({ exam, header, schools }: ResultPanelProps) {
+export function ResultPanel({ exam, header, schools, editor }: ResultPanelProps) {
   const [tab, setTab] = useState<Tab>('preview');
 
   if (!exam) {
@@ -47,7 +49,9 @@ export function ResultPanel({ exam, header, schools }: ResultPanelProps) {
       </div>
 
       <div className="lg:min-h-0 lg:flex-1 lg:overflow-hidden">
-        {tab === 'preview' && <PreviewDocument exam={exam} header={header} schools={schools} mode="prova" />}
+        {tab === 'preview' && (
+          <PreviewDocument exam={exam} header={header} schools={schools} mode="prova" editable editor={editor} />
+        )}
         {tab === 'gabarito' && <PreviewDocument exam={exam} header={header} schools={schools} mode="gabarito" />}
       </div>
     </section>

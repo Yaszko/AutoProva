@@ -14,7 +14,10 @@ export interface StyledRun {
   text: string;
   bold?: boolean;
   italic?: boolean;
+  underline?: boolean;
   color?: RgbColor;
+  /** Multiplicador de tamanho de fonte só deste run (1 = tamanho base do parágrafo). */
+  fontScale?: number;
   /** Cor usada para procurar a fórmula rasterizada correspondente no cache (ver mathRaster.ts). */
   mathColor?: MathColor;
 }
@@ -24,8 +27,11 @@ interface WordToken {
   text: string;
   bold: boolean;
   italic: boolean;
+  underline: boolean;
   color: RgbColor;
   widthMm: number;
+  /** Tamanho efetivo (já multiplicado por fontScale) usado para desenhar/medir este token. */
+  fontSizePt: number;
 }
 
 interface MathToken {
@@ -40,6 +46,12 @@ export type LayoutToken = WordToken | MathToken;
 export interface Line {
   tokens: LayoutToken[];
   heightMm: number;
+  /** Largura real ocupada pelos tokens da linha (soma de larguras + espaços) — usado para
+   * alinhamento centralizado/à direita em drawLines. */
+  widthMm: number;
+  /** Largura máxima disponível quando essa linha foi montada (pode variar por linha por causa da
+   * zona de exclusão do GABARITO) — mesma finalidade de widthMm para calcular o deslocamento. */
+  maxWidthMm: number;
 }
 
 export interface LayoutResult {
@@ -66,6 +78,7 @@ function wordTokensFromText(
   text: string,
   bold: boolean,
   italic: boolean,
+  underline: boolean,
   color: RgbColor,
   doc: jsPDF,
   fontSizePt: number,
@@ -79,26 +92,32 @@ function wordTokensFromText(
       text: word,
       bold,
       italic,
+      underline,
       color,
       widthMm: doc.getTextWidth(word),
+      fontSizePt,
     }));
 }
 
 // Converte uma lista de StyledRun (texto comum + segmentos $...$) em uma lista plana de tokens
-// (palavra ou imagem de fórmula), na ordem em que devem fluir/quebrar linha.
+// (palavra ou imagem de fórmula), na ordem em que devem fluir/quebrar linha. `baseFontSizePt` é o
+// tamanho do parágrafo — cada run pode escalar esse tamanho individualmente via `fontScale` (ver
+// StyledRun), então o tamanho efetivo de cada token é calculado aqui, não em examPdf.ts.
 export function tokenizeRuns(
   doc: jsPDF,
   runs: StyledRun[],
   mathCache: Map<string, RasterizedMath | null>,
-  fontSizePt: number,
+  baseFontSizePt: number,
 ): LayoutToken[] {
   const tokens: LayoutToken[] = [];
 
   for (const run of runs) {
     const bold = run.bold ?? false;
     const italic = run.italic ?? false;
+    const underline = run.underline ?? false;
     const color = run.color ?? BLACK;
     const mathColor = run.mathColor ?? "black";
+    const fontSizePt = baseFontSizePt * (run.fontScale ?? 1);
 
     for (const segment of splitTextSegments(run.text)) {
       if (segment.length === 0) continue;
@@ -112,11 +131,11 @@ export function tokenizeRuns(
         }
         // Fórmula ausente do cache ou que falhou ao renderizar: mesmo fallback do MathText.tsx —
         // mostra o segmento literal, delimitadores $ inclusos, como texto comum.
-        tokens.push(...wordTokensFromText(segment, bold, italic, color, doc, fontSizePt));
+        tokens.push(...wordTokensFromText(segment, bold, italic, underline, color, doc, fontSizePt));
         continue;
       }
 
-      tokens.push(...wordTokensFromText(segment, bold, italic, color, doc, fontSizePt));
+      tokens.push(...wordTokensFromText(segment, bold, italic, underline, color, doc, fontSizePt));
     }
   }
 
@@ -142,6 +161,7 @@ export function layoutParagraph(
   const lines: Line[] = [];
   let currentTokens: LayoutToken[] = [];
   let currentWidthMm = 0;
+  let currentMaxWidthMm = getMaxWidthMm(startYMm);
   let currentYMm = startYMm;
 
   function closeLine() {
@@ -149,8 +169,12 @@ export function layoutParagraph(
     const mathHeights = currentTokens
       .filter((t): t is MathToken => t.kind === "math")
       .map((t) => t.heightMm);
-    const heightMm = Math.max(baseLineHeightMm, ...mathHeights);
-    lines.push({ tokens: currentTokens, heightMm });
+    // Palavras com fontScale > 1 precisam de uma linha mais alta que o tamanho base do parágrafo.
+    const wordLineHeights = currentTokens
+      .filter((t): t is WordToken => t.kind === "word")
+      .map((t) => ptToMm(t.fontSizePt) * LINE_HEIGHT_MULTIPLIER);
+    const heightMm = Math.max(baseLineHeightMm, ...mathHeights, ...wordLineHeights);
+    lines.push({ tokens: currentTokens, heightMm, widthMm: currentWidthMm, maxWidthMm: currentMaxWidthMm });
     currentYMm += heightMm;
     currentTokens = [];
     currentWidthMm = 0;
@@ -161,6 +185,7 @@ export function layoutParagraph(
     if (currentTokens.length > 0 && currentWidthMm + spaceWidthMm + token.widthMm > maxWidthMm) {
       closeLine();
     }
+    if (currentTokens.length === 0) currentMaxWidthMm = getMaxWidthMm(currentYMm);
     const separatorMm = currentTokens.length > 0 ? spaceWidthMm : 0;
     currentTokens.push(token);
     currentWidthMm += separatorMm + token.widthMm;
@@ -177,18 +202,36 @@ export function layoutParagraph(
 const BASELINE_FRACTION = 0.78;
 const MATH_BASELINE_OFFSET_FRACTION = 0.82;
 
+const UNDERLINE_OFFSET_MM = 0.6;
+
 export function drawLines(
   doc: jsPDF,
   lines: Line[],
   xMm: number,
   startYMm: number,
   fontSizePt: number,
+  align: "left" | "center" | "right" = "left",
 ): number {
   let yMm = startYMm;
 
   for (const line of lines) {
-    let xCursorMm = xMm;
+    const alignOffsetMm =
+      align === "center" ? (line.maxWidthMm - line.widthMm) / 2 : align === "right" ? line.maxWidthMm - line.widthMm : 0;
+    let xCursorMm = xMm + Math.max(0, alignOffsetMm);
     const baselineMm = yMm + line.heightMm * BASELINE_FRACTION;
+
+    // Sequências contíguas de palavras sublinhadas viram um único traço (não um por palavra) para
+    // não cortar o sublinhado nos espaços entre elas.
+    let underlineStartMm: number | null = null;
+    let underlineColor: RgbColor = BLACK;
+
+    function flushUnderline(endMm: number) {
+      if (underlineStartMm === null) return;
+      doc.setDrawColor(underlineColor[0], underlineColor[1], underlineColor[2]);
+      doc.setLineWidth(0.15);
+      doc.line(underlineStartMm, baselineMm + UNDERLINE_OFFSET_MM, endMm, baselineMm + UNDERLINE_OFFSET_MM);
+      underlineStartMm = null;
+    }
 
     line.tokens.forEach((token, index) => {
       if (index > 0) {
@@ -197,16 +240,26 @@ export function drawLines(
       }
 
       if (token.kind === "word") {
-        applyFont(doc, token.bold, token.italic, fontSizePt);
+        applyFont(doc, token.bold, token.italic, token.fontSizePt);
         doc.setTextColor(token.color[0], token.color[1], token.color[2]);
         doc.text(token.text, xCursorMm, baselineMm);
+        if (token.underline) {
+          if (underlineStartMm === null) {
+            underlineStartMm = xCursorMm;
+            underlineColor = token.color;
+          }
+        } else {
+          flushUnderline(xCursorMm);
+        }
         xCursorMm += token.widthMm;
       } else {
+        flushUnderline(xCursorMm);
         const topMm = baselineMm - token.heightMm * MATH_BASELINE_OFFSET_FRACTION;
         doc.addImage(token.raster.dataUrl, "PNG", xCursorMm, topMm, token.widthMm, token.heightMm);
         xCursorMm += token.widthMm;
       }
     });
+    flushUnderline(xCursorMm);
 
     yMm += line.heightMm;
   }

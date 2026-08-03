@@ -9,10 +9,18 @@ export interface Alternativa {
 
 export type TipoQuestao = "multipla_escolha" | "dissertativa";
 
+/** Alinhamento de parágrafo do enunciado. Negrito/itálico/sublinhado/tamanho de fonte ficam
+ * embutidos no próprio texto via marcadores por trecho (ver richTextRuns.ts) — alinhamento é a
+ * única propriedade que faz sentido em nível de parágrafo inteiro. */
+export interface TextStyle {
+  align?: "left" | "center" | "right";
+}
+
 export interface Questao {
   numero: number;
   tipo: TipoQuestao;
   enunciado: string;
+  enunciadoStyle?: TextStyle;
   /** URL, data URI ou SVG inline opcional exibido abaixo do enunciado. */
   imagem?: string;
   alternativas: Alternativa[];
