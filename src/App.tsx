@@ -4,6 +4,7 @@ import { ConfigPanel } from './components/ConfigPanel';
 import { HeaderFieldsForm } from './components/HeaderFieldsForm';
 import { PromptArea } from './components/PromptArea';
 import { ResultPanel } from './components/ResultPanel';
+import { QuestionEditor } from './components/QuestionEditor';
 import { ErrorAlert } from './components/ErrorAlert';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useExamEditor } from './hooks/useExamEditor';
@@ -139,9 +140,11 @@ export default function App() {
       </header>
 
       {/* Abaixo de lg, a página flui e scrola normalmente (melhor para celular). A partir de lg, a
-          página fica travada e cada bloco (config, prévia) scrola internamente. A edição das
-          questões acontece direto na prévia (aba "Prévia da Prova"), não há mais painel à parte. */}
-      <main className="mx-auto grid w-full max-w-[96rem] grid-cols-1 gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:min-h-0 lg:flex-1 lg:grid-cols-[360px_1fr] lg:overflow-hidden">
+          página fica travada e cada bloco (config, prévia, editor) scrola internamente. A edição
+          das questões tem duas formas equivalentes — direto na prévia (aba "Prévia da Prova",
+          WYSIWYG) e neste painel lateral (formulário tradicional) — ambas usam o mesmo
+          ExamEditorHandlers, então nunca divergem uma da outra. */}
+      <main className="mx-auto grid w-full max-w-[96rem] grid-cols-1 gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:min-h-0 lg:flex-1 lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_1fr] lg:overflow-hidden 2xl:grid-cols-[360px_1fr_320px] 2xl:grid-rows-1">
         <div className="space-y-6 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
           <ConfigPanel
             provider={provider}
@@ -172,6 +175,10 @@ export default function App() {
 
         <div className="min-w-0 lg:min-h-0 lg:overflow-hidden">
           <ResultPanel exam={exam} header={header} schools={schools} editor={examEditor} />
+        </div>
+
+        <div className="col-span-full min-w-0 lg:min-h-0 lg:overflow-hidden 2xl:col-span-1">
+          <QuestionEditor exam={exam} editor={examEditor} />
         </div>
       </main>
     </div>
